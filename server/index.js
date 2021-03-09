@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const morgan = require('morgan');
 const auth = require('./auth/index');
 
@@ -35,6 +36,15 @@ app.use(notFound);
 app.use(errorHandler);
 
 const port = process.env.PORT || 5431;
-app.listen(port, () => {
-  console.log(`Listening on port ${port}...`);
-});
+mongoose
+  .connect('mongodb://localhost:27017/authrefresh', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+  })
+  .then(() =>
+    app.listen(port, () => {
+      console.log(`Listening on port ${port}...`);
+    })
+  )
+  .catch((err) => console.log('RuhRoh!😱'));

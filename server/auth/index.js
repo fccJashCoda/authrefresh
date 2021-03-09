@@ -1,5 +1,13 @@
 const express = require('express');
+const Joi = require('joi');
+const User = require('../models/User');
+const bcrypt = require('bcryptjs');
+
 const router = express.Router();
+const schema = Joi.object({
+  username: Joi.string().alphanum().min(3).max(20).required(),
+  password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9_]{8,30}$')).required(),
+});
 
 router.get('/', (req, res) => {
   res.json({
@@ -7,15 +15,45 @@ router.get('/', (req, res) => {
   });
 });
 
+router.get('/science', (req, res, next) => {
+  res.status(418);
+  const error = new Error("I'm a teapot!");
+  next(error);
+});
+
 // @POST /signup
 // @desc create a new account
 // @access public
-router.post('/signup', (req, res) => {
+router.post('/signup', (req, res, next) => {
   const { username, password } = req.body;
-  res.json({
-    message: '🍔',
+
+  const value = schema.validate({ username, password });
+  if (value.error) {
+    return next(value.error);
+  }
+
+  // hash the password
+  const salt = bcrypt.genSaltSync(12);
+  const hash = bcrypt.hashSync(password, salt);
+
+  // create our new user
+  const user = new User({
     username,
-    password,
+    password: hash,
+  });
+
+  // check if username is in database, if so return error, else, add user
+  User.findOne({ username }).then((foundUser) => {
+    if (foundUser) {
+      const error = new Error('Username already taken');
+      next(error);
+    } else {
+      user.save().then(() => {
+        res.json({
+          message: '🎉New user🎉',
+        });
+      });
+    }
   });
 });
 
