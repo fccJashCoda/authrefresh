@@ -76,15 +76,28 @@ router.post('/login', (req, res, next) => {
     return next(error);
   }
 
-  User.findOne({ username }).then((foundUser) => {
-    if (foundUser && bcrypt.compareSync(password, foundUser.password)) {
-      return res.json({ message: 'Party time 🎈🎊' });
-    }
-
-    const error = new Error('Invalid Username or Password');
-    res.status(401);
-    next(error);
-  });
+  User.findOne({ username })
+    .then((foundUser) => {
+      if (foundUser) {
+        bcrypt.compare(password, foundUser.password).then((valid) => {
+          if (valid) {
+            return res.json({ message: 'Party time 🎈🎊' });
+          }
+          const error = new Error('Invalid Username or Password');
+          res.status(401);
+          return next(error);
+        });
+      } else {
+        const error = new Error('Invalid Username or Password');
+        res.status(401);
+        return next(error);
+      }
+    })
+    .catch((err) => {
+      const error = new Error('RuhRoh! 😱 Unexpected server error!');
+      res.status(500);
+      next(error);
+    });
 });
 
 module.exports = router;
