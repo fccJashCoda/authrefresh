@@ -59,4 +59,31 @@ router.post('/signup', (req, res, next) => {
   });
 });
 
+// @POST /login
+// @desc login an account
+// @access public
+router.post('/login', (req, res, next) => {
+  const { username, password } = req.body;
+
+  console.log('incoming: ', req.body);
+
+  if (!username || !password) {
+    const error = new Error('Missing Username of Password');
+    res.status(422);
+    return next(error);
+  }
+
+  User.findOne({ username }).then((foundUser) => {
+    if (foundUser) {
+      if (bcrypt.compareSync(password, foundUser.password)) {
+        return res.json({ message: 'Party time 🎈🎊' });
+      }
+    }
+
+    const error = new Error('Invalid Username or Password');
+    res.status(401);
+    next(error);
+  });
+});
+
 module.exports = router;

@@ -1,39 +1,48 @@
 <template>
   <!-- eslint-disable max-len  -->
-  <form @submit.prevent="signup" class='mt-3'>
-    <h1>Signup</h1>
-    <div v-if="errorMessage" class="alert alert-danger" role="alert">
-      {{errorMessage}}
+  <section>
+    <div v-if="loading" class='d-flex justify-content-center p-5'>
+      <img src="../assets/Triangles-1s-200px.svg" alt="loading animation" class='mt-5'>
     </div>
-    <div class="mb-3">
-      <label for="username" class="form-label">Username</label>
-      <input v-model="user.username"  type="text" required class="form-control" aria-describedby="usernameHelp" id="username" name="username" placeholder="Enter username">
-      <small id="usernameHelp" class="form-text text-muted">
-        Username must be longer than two characters and shorter than 30. Username must be alphanumeric, underscores are allowed.
-      </small>
-  </div>
-    <div class="row mb-3">
-      <div class="col">
-        <label for="password" class="form-label">Password</label>
-        <input v-model="user.password" type="password" required class="form-control" aria-describedby="passwordHelp" id="password" name="password" placeholder="Password">
-        <small id="passwordHelp" class="form-text text-muted">
-          Password must be at least 10 characters
+    <form v-if="!loading" @submit.prevent="signup" class='mt-3'>
+      <h1>Signup</h1>
+      <div v-if="errorMessage" class="alert alert-danger" role="alert">
+        {{errorMessage}}
+      </div>
+      <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input v-model="user.username"  type="text" required class="form-control" aria-describedby="usernameHelp" id="username" name="username" placeholder="Enter username">
+        <small id="usernameHelp" class="form-text text-muted">
+          Username must be longer than two characters and shorter than 30. Username must be alphanumeric, underscores are allowed.
         </small>
       </div>
-      <div class="col">
-        <label for="confirmPassword" class="form-label">Confirm Password</label>
-        <input v-model="user.confirmPassword" type="password" required class="form-control" aria-describedby="confirmPasswordHelp" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password">
-        <small id="confirmPasswordHelp" class="form-text text-muted">
-          Please confirm password
-        </small>
-      </div>
-    </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
+        <div class="row mb-3">
+          <div class="col">
+            <label for="password" class="form-label">Password</label>
+            <input v-model="user.password" type="password" required class="form-control" aria-describedby="passwordHelp" id="password" name="password" placeholder="Password">
+            <small id="passwordHelp" class="form-text text-muted">
+              Password must be at least 10 characters
+            </small>
+          </div>
+          <div class="col">
+            <label for="confirmPassword" class="form-label">Confirm Password</label>
+            <input v-model="user.confirmPassword" type="password" required class="form-control" aria-describedby="confirmPasswordHelp" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password">
+            <small id="confirmPasswordHelp" class="form-text text-muted">
+              Please confirm password
+            </small>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary mb-5">Submit</button>
+      </form>
+  </section>
 </template>
 
 <script>
 import Joi from 'joi';
+
+// import Triangles from '../assets/Triangles-1s-200px.svg';
+
+const API_URL = 'http://localhost:5431/auth/signup';
 
 const schema = Joi.object({
   username: Joi
@@ -54,6 +63,7 @@ const schema = Joi.object({
 
 export default {
   data: () => ({
+    loading: false,
     errorMessage: '',
     user: {
       username: '',
@@ -77,7 +87,6 @@ export default {
           password: this.user.password,
         };
 
-        console.log('waldo: ', body);
         const options = {
           method: 'POST',
           headers: {
@@ -85,7 +94,8 @@ export default {
           },
           body: JSON.stringify(body),
         };
-        fetch('http://localhost:5431/auth/signup', options)
+        this.loading = true;
+        fetch(API_URL, options)
           .then((response) => {
             if (response.ok) {
               return response.json();
@@ -94,10 +104,16 @@ export default {
             return response.json().then((error) => {
               throw new Error(error.message);
             });
-          }).then((user) => {
-            console.log(user);
+          }).then(() => {
+            setTimeout(() => {
+              this.loading = false;
+            }, 1000);
+            this.$router.push({ name: 'Login' });
           }).catch((error) => {
-            console.log(error);
+            setTimeout(() => {
+              this.loading = false;
+            }, 1000);
+            this.errorMessage = error.message;
           });
       }
       return null;
@@ -118,11 +134,6 @@ export default {
         this.errorMessage = 'Invalid Password';
       }
       return false;
-    },
-    clearFields() {
-      this.user.username = '';
-      this.user.password = '';
-      this.user.confirmPassword = '';
     },
   },
   name: 'Signup',
