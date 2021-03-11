@@ -26,7 +26,6 @@ router.get('/science', (req, res, next) => {
 // @POST /signup
 // @desc create a new account
 // @access public
-
 router.post('/signup', (req, res, next) => {
   const { username, password } = req.body;
 
@@ -35,35 +34,34 @@ router.post('/signup', (req, res, next) => {
     return next(value.error);
   }
 
-  bcrypt
-    .genSalt(saltRounds)
-    .then((salt) => bcrypt.hash(password, salt))
-    .then((hash) => {
-      const user = new User({
-        username,
-        password: hash,
-      });
+  User.findOne({ username }).then((foundUser) => {
+    if (foundUser) {
+      const error = new Error('Username already taken');
+      res.status(409);
+      return next(error);
+    }
+    bcrypt
+      .genSalt(saltRounds)
+      .then((salt) => bcrypt.hash(password, salt))
+      .then((hash) => {
+        const user = new User({
+          username,
+          password: hash,
+        });
 
-      User.findOne({ username }).then((foundUser) => {
-        if (foundUser) {
-          const error = new Error('Username already taken');
-          res.status(409);
-          next(error);
-        } else {
-          user.save().then((newUser) => {
-            res.json({
-              username: newUser.username,
-              _id: newUser._id,
-            });
+        user.save().then((newUser) => {
+          res.json({
+            username: newUser.username,
+            _id: newUser._id,
           });
-        }
+        });
+      })
+      .catch((err) => {
+        const error = new Error('Unexpected server error');
+        res.status(500);
+        next(error);
       });
-    })
-    .catch((err) => {
-      const error = new Error('Unexpected server error');
-      res.status(500);
-      next(error);
-    });
+  });
 });
 
 // @POST /login

@@ -2,7 +2,7 @@
   <!-- eslint-disable max-len  -->
   <div id="app">
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-      <a class="navbar-brand" href="#">Auth Refresher</a>
+      <a v-on:click="goHome" class="navbar-brand" href="#">Auth Refresher</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -11,5 +11,12 @@
   </div>
 </template>
 
-<style>
-</style>
+<script>
+export default {
+  methods: {
+    goHome() {
+      this.$router.push({ name: 'Home' });
+    },
+  },
+};
+</script>
