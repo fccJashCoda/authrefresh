@@ -3,6 +3,8 @@ const Joi = require('joi');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 
+const saltRounds = 12;
+
 const router = express.Router();
 const schema = Joi.object({
   username: Joi.string().alphanum().min(3).max(20).required(),
@@ -24,6 +26,7 @@ router.get('/science', (req, res, next) => {
 // @POST /signup
 // @desc create a new account
 // @access public
+
 router.post('/signup', (req, res, next) => {
   const { username, password } = req.body;
 
@@ -32,31 +35,35 @@ router.post('/signup', (req, res, next) => {
     return next(value.error);
   }
 
-  // hash the password
-  const salt = bcrypt.genSaltSync(12);
-  const hash = bcrypt.hashSync(password, salt);
-
-  // create our new user
-  const user = new User({
-    username,
-    password: hash,
-  });
-
-  // check if username is in database, if so return error, else, add user
-  User.findOne({ username }).then((foundUser) => {
-    if (foundUser) {
-      const error = new Error('Username already taken');
-      res.status(409);
-      next(error);
-    } else {
-      user.save().then((newUser) => {
-        res.json({
-          username: newUser.username,
-          _id: newUser._id,
-        });
+  bcrypt
+    .genSalt(saltRounds)
+    .then((salt) => bcrypt.hash(password, salt))
+    .then((hash) => {
+      const user = new User({
+        username,
+        password: hash,
       });
-    }
-  });
+
+      User.findOne({ username }).then((foundUser) => {
+        if (foundUser) {
+          const error = new Error('Username already taken');
+          res.status(409);
+          next(error);
+        } else {
+          user.save().then((newUser) => {
+            res.json({
+              username: newUser.username,
+              _id: newUser._id,
+            });
+          });
+        }
+      });
+    })
+    .catch((err) => {
+      const error = new Error('Unexpected server error');
+      res.status(500);
+      next(error);
+    });
 });
 
 // @POST /login
@@ -65,19 +72,15 @@ router.post('/signup', (req, res, next) => {
 router.post('/login', (req, res, next) => {
   const { username, password } = req.body;
 
-  console.log('incoming: ', req.body);
-
   if (!username || !password) {
-    const error = new Error('Missing Username of Password');
+    const error = new Error('Missing Username or Password');
     res.status(422);
     return next(error);
   }
 
   User.findOne({ username }).then((foundUser) => {
-    if (foundUser) {
-      if (bcrypt.compareSync(password, foundUser.password)) {
-        return res.json({ message: 'Party time 🎈🎊' });
-      }
+    if (foundUser && bcrypt.compareSync(password, foundUser.password)) {
+      return res.json({ message: 'Party time 🎈🎊' });
     }
 
     const error = new Error('Invalid Username or Password');
