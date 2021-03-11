@@ -46,11 +46,13 @@ router.post('/signup', (req, res, next) => {
   User.findOne({ username }).then((foundUser) => {
     if (foundUser) {
       const error = new Error('Username already taken');
+      res.status(409);
       next(error);
     } else {
-      user.save().then(() => {
+      user.save().then((newUser) => {
         res.json({
-          message: '🎉New user🎉',
+          username: newUser.username,
+          _id: newUser._id,
         });
       });
     }

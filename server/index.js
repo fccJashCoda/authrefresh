@@ -2,12 +2,18 @@ const express = require('express');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
 const auth = require('./auth/index');
+const cors = require('cors');
 
 const app = express();
 
 app.use(morgan('tiny'));
 app.use(express.urlencoded());
 app.use(express.json());
+app.use(
+  cors({
+    origin: 'http://localhost:8080',
+  })
+);
 
 // Router
 app.use('/auth', auth);
@@ -25,6 +31,7 @@ const notFound = (req, res, next) => {
 };
 
 const errorHandler = (err, req, res, next) => {
+  console.log('something went wrong', res.statusCode || 'potato');
   res.status(res.statusCode || 500);
   res.json({
     message: err.message,

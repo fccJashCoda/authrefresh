@@ -33,6 +33,24 @@
 </template>
 
 <script>
+import Joi from 'joi';
+
+const schema = Joi.object({
+  username: Joi
+    .string()
+    .alphanum()
+    .min(3)
+    .max(20)
+    .required(),
+  password: Joi
+    .string()
+    .pattern(new RegExp('^[a-zA-Z0-9_]{8,30}$'))
+    .required(),
+  confirmPassword: Joi
+    .string()
+    .pattern(new RegExp('^[a-zA-Z0-9_]{8,30}$'))
+    .required(),
+});
 
 export default {
   data: () => ({
@@ -43,10 +61,44 @@ export default {
       confirmPassword: '',
     },
   }),
+  watch: {
+    user: {
+      handler() {
+        this.errorMessage = '';
+      },
+      deep: true,
+    },
+  },
   methods: {
     signup() {
       if (this.validUser()) {
-        // send data to server...
+        const body = {
+          username: this.user.username,
+          password: this.user.password,
+        };
+
+        console.log('waldo: ', body);
+        const options = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(body),
+        };
+        fetch('http://localhost:5431/auth/signup', options)
+          .then((response) => {
+            if (response.ok) {
+              return response.json();
+            }
+
+            return response.json().then((error) => {
+              throw new Error(error.message);
+            });
+          }).then((user) => {
+            console.log(user);
+          }).catch((error) => {
+            console.log(error);
+          });
       }
       return null;
     },
@@ -55,10 +107,17 @@ export default {
         this.errorMessage = 'Passwords must match.';
         return false;
       }
-      // if (this.user.usrname.length < 3 || this.user.username.length > 30) {
-      //   return false;
-      // }
-      return true;
+
+      const result = schema.validate(this.user);
+      if (!result.error) {
+        return true;
+      }
+      if (result.error.message.includes('username')) {
+        this.errorMessage = 'Invalid Username';
+      } else {
+        this.errorMessage = 'Invalid Password';
+      }
+      return false;
     },
     clearFields() {
       this.user.username = '';
