@@ -32,7 +32,7 @@
             </small>
           </div>
         </div>
-        <button type="submit" class="btn btn-primary mb-5">Submit</button>
+        <button type="submit" class="btn btn-primary mb-5">Sign-up</button>
       </form>
   </section>
 </template>
@@ -104,16 +104,17 @@ export default {
             return response.json().then((error) => {
               throw new Error(error.message);
             });
-          }).then(() => {
+          }).then((result) => {
+            localStorage.setItem('token', result.token);
             setTimeout(() => {
               this.loading = false;
+              this.$router.push({ name: 'Dashboard' });
             }, 1000);
-            this.$router.push({ name: 'Login' });
           }).catch((error) => {
             setTimeout(() => {
               this.loading = false;
+              this.errorMessage = error.message;
             }, 1000);
-            this.errorMessage = error.message;
           });
       }
       return null;

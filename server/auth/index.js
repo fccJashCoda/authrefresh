@@ -3,9 +3,21 @@ const Joi = require('joi');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const tools = require('../utils/tools');
 
 const saltRounds = 12;
+
+const returnError = (code, res, next) => {
+  const messages = {
+    401: 'Invalid Username or Password',
+    409: 'Username already taken',
+    418: "I'm a teapot!",
+    422: 'Missing Username or Password',
+    500: 'RuhRoh! 😱 Unexpected server error!',
+  };
+  const error = new Error(messages[code]);
+  res.status(code);
+  next(error);
+};
 
 const router = express.Router();
 const schema = Joi.object({
@@ -13,14 +25,35 @@ const schema = Joi.object({
   password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9_]{8,30}$')).required(),
 });
 
+const createTokenSendResponse = (user, res, next) => {
+  const payload = {
+    _id: user._id,
+    username: user.username,
+  };
+  jwt.sign(
+    payload,
+    process.env.SECRET_KEY,
+    { expiresIn: '1h' },
+    (err, token) => {
+      if (err) {
+        return returnError(500, res, next);
+      } else {
+        return res.json({
+          token,
+        });
+      }
+    }
+  );
+};
+
 router.get('/', (req, res) => {
   res.json({
-    message: 'auth router says hi',
+    message: 'auth router',
   });
 });
 
 router.get('/science', (req, res, next) => {
-  tools.returnError(418, "I'm a teapot!", res, next);
+  returnError(418, res, next);
 });
 
 // @POST /signup
@@ -36,7 +69,7 @@ router.post('/signup', (req, res, next) => {
 
   User.findOne({ username }).then((foundUser) => {
     if (foundUser) {
-      return tools.returnError(409, 'Username already taken', res, next);
+      return returnError(409, res, next);
     }
     bcrypt
       .genSalt(saltRounds)
@@ -48,14 +81,15 @@ router.post('/signup', (req, res, next) => {
         });
 
         user.save().then((newUser) => {
-          res.json({
-            username: newUser.username,
-            _id: newUser._id,
-          });
+          createTokenSendResponse(newUser, res, next);
+          // res.json({
+          //   username: newUser.username,
+          //   _id: newUser._id,
+          // });
         });
       })
       .catch((err) => {
-        tools.returnError(500, 'Unexpected server error', res, next);
+        returnError(500, res, next);
       });
   });
 });
@@ -67,7 +101,7 @@ router.post('/login', (req, res, next) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    return tools.returnError(422, 'Missing Username or Password', res, next);
+    return returnError(422, res, next);
   }
 
   User.findOne({ username })
@@ -75,49 +109,17 @@ router.post('/login', (req, res, next) => {
       if (foundUser) {
         bcrypt.compare(password, foundUser.password).then((valid) => {
           if (valid) {
-            const payload = {
-              _id: foundUser._id,
-              username: foundUser.username,
-            };
-            jwt.sign(
-              payload,
-              process.env.SECRET_KEY,
-              { expiresIn: '1h' },
-              (err, token) => {
-                if (err) {
-                  return tools.returnError(
-                    500,
-                    'Unexpected server error',
-                    res,
-                    next
-                  );
-                } else {
-                  return res.json({
-                    token,
-                  });
-                }
-              }
-            );
+            createTokenSendResponse(foundUser, res, next);
           } else {
-            return tools.returnError(
-              401,
-              'Invalid Username or Password',
-              res,
-              next
-            );
+            return returnError(401, res, next);
           }
         });
       } else {
-        return tools.returnError(
-          401,
-          'Invalid Username or Password',
-          res,
-          next
-        );
+        return returnError(401, res, next);
       }
     })
     .catch((err) => {
-      tools.returnError(500, 'RuhRoh! 😱 Unexpected server error!', res, next);
+      returnError(500, res, next);
     });
 });
 
