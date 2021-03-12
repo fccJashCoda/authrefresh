@@ -2,6 +2,7 @@ const express = require('express');
 const Joi = require('joi');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
+const tools = require('../utils/tools');
 
 const saltRounds = 12;
 
@@ -18,9 +19,7 @@ router.get('/', (req, res) => {
 });
 
 router.get('/science', (req, res, next) => {
-  res.status(418);
-  const error = new Error("I'm a teapot!");
-  next(error);
+  tools.returnError(418, "I'm a teapot!", res, next);
 });
 
 // @POST /signup
@@ -36,9 +35,7 @@ router.post('/signup', (req, res, next) => {
 
   User.findOne({ username }).then((foundUser) => {
     if (foundUser) {
-      const error = new Error('Username already taken');
-      res.status(409);
-      return next(error);
+      return tools.returnError(409, 'Username already taken', res, next);
     }
     bcrypt
       .genSalt(saltRounds)
@@ -57,9 +54,7 @@ router.post('/signup', (req, res, next) => {
         });
       })
       .catch((err) => {
-        const error = new Error('Unexpected server error');
-        res.status(500);
-        next(error);
+        tools.returnError(500, 'Unexpected server error', res, next);
       });
   });
 });
@@ -71,9 +66,7 @@ router.post('/login', (req, res, next) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    const error = new Error('Missing Username or Password');
-    res.status(422);
-    return next(error);
+    return tools.returnError(422, 'Missing Username or Password', res, next);
   }
 
   User.findOne({ username })
@@ -83,20 +76,24 @@ router.post('/login', (req, res, next) => {
           if (valid) {
             return res.json({ message: 'Party time 🎈🎊' });
           }
-          const error = new Error('Invalid Username or Password');
-          res.status(401);
-          return next(error);
+          return tools.returnError(
+            401,
+            'Invalid Username or Password',
+            res,
+            next
+          );
         });
       } else {
-        const error = new Error('Invalid Username or Password');
-        res.status(401);
-        return next(error);
+        return tools.returnError(
+          401,
+          'Invalid Username or Password',
+          res,
+          next
+        );
       }
     })
     .catch((err) => {
-      const error = new Error('RuhRoh! 😱 Unexpected server error!');
-      res.status(500);
-      next(error);
+      tools.returnError(500, 'RuhRoh! 😱 Unexpected server error!', res, next);
     });
 });
 
