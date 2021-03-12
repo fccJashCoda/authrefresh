@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const auth = require('./auth/index');
 const cors = require('cors');
 const tools = require('./utils/tools');
+require('dotenv').config();
 
 const app = express();
 
@@ -27,9 +28,6 @@ app.get('/', (req, res) => {
 
 const notFound = (req, res, next) => {
   tools.returnError(404, `Not Found - ${req.originalUrl}`, res, next);
-  // res.status(404);
-  // const error = new Error(`Not Found - ${req.originalUrl}`);
-  // next(error);
 };
 
 const errorHandler = (err, req, res, next) => {

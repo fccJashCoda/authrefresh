@@ -2,6 +2,7 @@ const express = require('express');
 const Joi = require('joi');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const tools = require('../utils/tools');
 
 const saltRounds = 12;
@@ -74,14 +75,37 @@ router.post('/login', (req, res, next) => {
       if (foundUser) {
         bcrypt.compare(password, foundUser.password).then((valid) => {
           if (valid) {
-            return res.json({ message: 'Party time 🎈🎊' });
+            const payload = {
+              _id: foundUser._id,
+              username: foundUser.username,
+            };
+            jwt.sign(
+              payload,
+              process.env.SECRET_KEY,
+              { expiresIn: '1h' },
+              (err, token) => {
+                if (err) {
+                  return tools.returnError(
+                    500,
+                    'Unexpected server error',
+                    res,
+                    next
+                  );
+                } else {
+                  return res.json({
+                    token,
+                  });
+                }
+              }
+            );
+          } else {
+            return tools.returnError(
+              401,
+              'Invalid Username or Password',
+              res,
+              next
+            );
           }
-          return tools.returnError(
-            401,
-            'Invalid Username or Password',
-            res,
-            next
-          );
         });
       } else {
         return tools.returnError(
