@@ -48,7 +48,8 @@ const createTokenSendResponse = (user, res, next) => {
 
 router.get('/', (req, res) => {
   res.json({
-    message: 'auth router',
+    message: 'auth router 🐾',
+    user: req.user,
   });
 });
 

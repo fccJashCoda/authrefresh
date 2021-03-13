@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const auth = require('./auth/index');
 const cors = require('cors');
 require('dotenv').config();
+const middlewares = require('./auth/middleware');
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(
     origin: 'http://localhost:8080',
   })
 );
+app.use(middlewares.checkTokenSetUser);
 
 // Router
 app.use('/auth', auth);
