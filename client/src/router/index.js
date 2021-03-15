@@ -42,7 +42,6 @@ const routes = [
     name: 'Dashboard',
     component: Dashboard,
     beforeEnter: (to, from, next) => {
-      console.log('debug');
       if (localStorage.getItem('token')) {
         next();
       } else {

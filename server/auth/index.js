@@ -33,7 +33,7 @@ const createTokenSendResponse = (user, res, next) => {
   jwt.sign(
     payload,
     process.env.SECRET_KEY,
-    { expiresIn: '1h' },
+    { expiresIn: '1d' },
     (err, token) => {
       if (err) {
         return returnError(500, res, next);
@@ -65,6 +65,7 @@ router.post('/signup', (req, res, next) => {
 
   const value = schema.validate({ username, password });
   if (value.error) {
+    res.status(422);
     return next(value.error);
   }
 
@@ -83,10 +84,6 @@ router.post('/signup', (req, res, next) => {
 
         user.save().then((newUser) => {
           createTokenSendResponse(newUser, res, next);
-          // res.json({
-          //   username: newUser.username,
-          //   _id: newUser._id,
-          // });
         });
       })
       .catch((err) => {

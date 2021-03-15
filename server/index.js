@@ -1,9 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
-const auth = require('./auth/index');
 const cors = require('cors');
 require('dotenv').config();
+const auth = require('./auth/index');
+const notes = require('./api/notes');
 const middlewares = require('./auth/middleware');
 
 const app = express();
@@ -20,6 +21,7 @@ app.use(middlewares.checkTokenSetUser);
 
 // Router
 app.use('/auth', auth);
+app.use('/api/v1/notes', middlewares.isLoggedIn, notes);
 
 app.get('/', (req, res) => {
   res.json({
@@ -34,7 +36,9 @@ const notFound = (req, res, next) => {
 };
 
 const errorHandler = (err, req, res, next) => {
-  console.log('something went wrong', res.statusCode || 'potato');
+  if (res.statusCode === 200) {
+    res.status(500);
+  }
   res.status(res.statusCode || 500);
   res.json({
     message: err.message,
