@@ -1,5 +1,6 @@
 <template>
   <!-- eslint-disable max-len -->
+
   <section class='p-4'>
     <h1>Dashboard</h1>
     <h3 v-if="!user">Getting user information...</h3>
@@ -19,12 +20,12 @@
       <button type="submit" class="btn btn-primary">Post note</button>
     </form>
     <section class='row mt-4'>
-      <div v-for="note in notes" v-bind:key="note.createdAt" class="col-4">
+      <div v-for="note in notes" v-bind:key="note._id" class="col-6">
         <div class="card text-white border-primary mb-3">
-          <div class="card-header">{{note.createdAt}}</div>
+          <div class="card-header d-flex d-flex justify-content-between align-items-center"><span>{{note.createdAt}}</span><span @click="deleteNote(note._id)" class="btn btn-info">🧨</span></div>
           <div class="card-body">
             <h4 class="card-title">{{note.title}}</h4>
-            <p class="card-text">{{note.text}}</p>
+            <p class="card-text" v-html="renderMarkdown(note.text)"></p>
           </div>
         </div>
       </div>
@@ -33,7 +34,13 @@
 </template>
 
 <script>
+import Markdownit from 'markdown-it';
+import emoji from 'markdown-it-emoji';
+
 const API_URL = 'http://localhost:5431/';
+
+const md = new Markdownit();
+md.use(emoji);
 
 export default {
   data: () => ({
@@ -99,7 +106,24 @@ export default {
           this.notes = posts;
           return null;
         })
-        .catch(() => console.log("shit's on fire"));
+        .catch(() => console.log('Something went south'));
+    },
+    deleteNote(id) {
+      console.log(id);
+      console.log('target acquired 🛰');
+      fetch(`${API_URL}api/v1/notes/${id}`, {
+        method: 'DELETE',
+        headers: {
+          authorization: `bearer ${localStorage.getItem('token')}`,
+        },
+      })
+        .then(() => {
+          this.notes = this.notes.filter((note) => note._id !== id);
+        })
+        .catch(() => console.log('😟'));
+    },
+    renderMarkdown(note) {
+      return md.render(note);
     },
     showForm() {
       this.toggleForm = !this.toggleForm;
@@ -108,3 +132,13 @@ export default {
   name: 'Dashboard',
 };
 </script>
+
+<style>
+  .card {
+    height: 90%;
+  }
+
+  .card-text img {
+    width: 100%;
+  }
+</style>
