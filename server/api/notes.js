@@ -56,4 +56,17 @@ router.post('/', (req, res, next) => {
   }
 });
 
+// @POST /login
+// @desc login an account
+// @access public
+router.delete('/:id', (req, res, next) => {
+  Note.deleteOne({ _id: req.params.id })
+    .then(() => res.json({ message: `Deleted note with id: ${req.params.id}` }))
+    .catch(() => {
+      const error = new Error('This note does not exist');
+      res.status(500);
+      next(error);
+    });
+});
+
 module.exports = router;

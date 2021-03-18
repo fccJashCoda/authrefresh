@@ -2,11 +2,12 @@ const express = require('express');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
 const cors = require('cors');
+const helmet = require('helmet');
 require('dotenv').config();
 const auth = require('./auth/index');
 const notes = require('./api/notes');
+const users = require('./api/users');
 const middlewares = require('./auth/middleware');
-
 const app = express();
 
 app.use(morgan('tiny'));
@@ -17,11 +18,13 @@ app.use(
     origin: 'http://localhost:8080',
   })
 );
+app.use(helmet());
 app.use(middlewares.checkTokenSetUser);
 
 // Router
 app.use('/auth', auth);
 app.use('/api/v1/notes', middlewares.isLoggedIn, notes);
+app.use('/api/v1/users', users);
 
 app.get('/', (req, res) => {
   res.json({
