@@ -1,3 +1,4 @@
+const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
 function checkTokenSetUser(req, res, next) {
@@ -32,7 +33,23 @@ function isLoggedIn(req, res, next) {
   }
 }
 
+async function isAdmin(req, res, next) {
+  try {
+    const user = await User.findOne({ _id: req.user._id });
+    console.log(user);
+    if (user && user.role === 'admin') {
+      next();
+    } else {
+      res.status(401);
+      throw new Error('Unauthorized access');
+    }
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   checkTokenSetUser,
   isLoggedIn,
+  isAdmin,
 };

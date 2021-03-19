@@ -104,7 +104,8 @@ router.post('/login', (req, res, next) => {
 
   User.findOne({ username })
     .then((foundUser) => {
-      if (foundUser) {
+      if (foundUser && foundUser.active) {
+        // need to rethink how errors are passed and refactor
         bcrypt.compare(password, foundUser.password).then((valid) => {
           if (valid) {
             createTokenSendResponse(foundUser, res, next);

@@ -24,7 +24,7 @@ app.use(middlewares.checkTokenSetUser);
 // Router
 app.use('/auth', auth);
 app.use('/api/v1/notes', middlewares.isLoggedIn, notes);
-app.use('/api/v1/users', users);
+app.use('/api/v1/users', middlewares.isLoggedIn, middlewares.isAdmin, users);
 
 app.get('/', (req, res) => {
   res.json({
