@@ -9,21 +9,19 @@ const saltRounds = 12;
 const returnError = (code, res, next) => {
   const messages = {
     401: 'Invalid Username or Password',
-    409: 'Username already taken',
+    409: 'Username unavailable',
     418: "I'm a teapot!",
     422: 'Missing Username or Password',
     500: 'RuhRoh! 😱 Unexpected server error!',
   };
   const error = new Error(messages[code]);
   res.status(code);
-  console.log('RETURN ERROR HIT');
   next(error);
 };
 
 const router = express.Router();
 const schema = Joi.object({
-  username: Joi.string().alphanum().min(3).max(20)
-    .required(),
+  username: Joi.string().alphanum().min(3).max(20).required(),
   password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9_]{8,30}$')).required(),
 });
 
@@ -42,8 +40,9 @@ const createTokenSendResponse = (user, res, next) => {
       }
       return res.json({
         token,
+        user: user.username,
       });
-    },
+    }
   );
 };
 

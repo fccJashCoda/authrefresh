@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: 'http://localhost:8080',
-  }),
+  })
 );
 app.use(helmet());
 app.use(middlewares.checkTokenSetUser);
@@ -40,6 +40,7 @@ function notFound(req, res, next) {
   next(error);
 }
 
+// eslint-disable-next-line
 function errorHandler(err, req, res, next) {
   if (res.statusCode === 200) {
     res.status(500);
@@ -54,9 +55,13 @@ function errorHandler(err, req, res, next) {
 app.use(notFound);
 app.use(errorHandler);
 
-const port = process.env.PORT || 5431;
+let dbURL = process.env.MONGO_URI;
+if (process.env.NODE_ENV === 'test') {
+  dbURL = process.env.TEST_MONGO_URI;
+}
+
 mongoose
-  .connect(process.env.MONGO_URI, {
+  .connect(dbURL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,

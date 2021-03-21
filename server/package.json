@@ -9,7 +9,7 @@
     "seed": "node src/tasks/seedDbWithAdmin",
     "science": "node src/tasks/test",
     "lint": "eslint src/",
-    "test": "mocha src/**/*.test.js --watch"
+    "test": "SET NODE_ENV=test& mocha src/**/*.test.js --watch"
   },
   "keywords": [],
   "author": "",
