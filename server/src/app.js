@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 require('dotenv').config();
-const auth = require('./auth/index');
+const auth = require('./auth/auth.routes');
 const notes = require('./api/notes');
 const users = require('./api/users');
 const middlewares = require('./auth/middleware');
@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: 'http://localhost:8080',
-  })
+  }),
 );
 app.use(helmet());
 app.use(middlewares.checkTokenSetUser);

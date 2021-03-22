@@ -23,9 +23,6 @@ describe('Sign-up Suite', () => {
         .expect(422);
       expect(response.body.message).to.equal('"username" is required');
     });
-  });
-
-  describe('POST /auth/signup', () => {
     it('should require a password', async () => {
       const response = await request(app)
         .post('/auth/signup')
@@ -33,33 +30,15 @@ describe('Sign-up Suite', () => {
         .expect(422);
       expect(response.body.message).to.equal('"password" is required');
     });
-  });
-
-  describe('POST /auth/signup', () => {
-    it('should require a password', async () => {
-      const response = await request(app)
-        .post('/auth/signup')
-        .send({ username: 'ab' })
-        .expect(422);
-      expect(response.body.message).to.equal(
-        '"username" length must be at least 3 characters long'
-      );
-    });
-  });
-
-  describe('POST /auth/signup', () => {
     it('username should be at least 3 characters long', async () => {
       const response = await request(app)
         .post('/auth/signup')
         .send({ username: 'ab' })
         .expect(422);
       expect(response.body.message).to.equal(
-        '"username" length must be at least 3 characters long'
+        '"username" length must be at least 3 characters long',
       );
     });
-  });
-
-  describe('POST /auth/signup', () => {
     it('password should match the base regex pattern', async () => {
       const response = await request(app)
         .post('/auth/signup')
@@ -69,12 +48,12 @@ describe('Sign-up Suite', () => {
         })
         .expect(422);
       expect(response.body.message).to.equal(
-        '"password" with value "ab" fails to match the required pattern: /^[a-zA-Z0-9_]{8,30}$/'
+        '"password" with value "ab" fails to match the required pattern: /^[a-zA-Z0-9_]{8,30}$/',
       );
     });
   });
 
-  describe('POST /auth/signup', () => {
+  describe('POST /auth/signup - Registration test', () => {
     before(async () => {
       await mongoose.connection.db.dropCollection('users');
     });
@@ -91,9 +70,6 @@ describe('Sign-up Suite', () => {
       expect(response.body).to.have.property('token');
       expect(response.body.user).to.equal(newUser.username);
     });
-  });
-
-  describe('POST /auth/signup', () => {
     it('should not allow you to register with an existing username', async () => {
       const newUser = {
         username: 'steve',
@@ -111,6 +87,30 @@ describe('Sign-up Suite', () => {
 
 describe('Login Suite', () => {
   describe('POST /auth/login', () => {
+    it('returns an error if no username is provided', async () => {
+      const invalidUser = {
+        username: '',
+        password: 'absolutely',
+      };
+
+      const response = await request(app)
+        .post('/auth/login')
+        .send(invalidUser)
+        .expect(422);
+      expect(response.body.message).to.equal('Missing Username or Password');
+    });
+    it('returns an error if no password is provided', async () => {
+      const invalidUser = {
+        username: 'steve',
+        password: '',
+      };
+
+      const response = await request(app)
+        .post('/auth/login')
+        .send(invalidUser)
+        .expect(422);
+      expect(response.body.message).to.equal('Missing Username or Password');
+    });
     it('returns a 401 with an invalid username', async () => {
       const invalidUser = {
         username: 'STEVE',
@@ -123,9 +123,6 @@ describe('Login Suite', () => {
         .expect(401);
       expect(response.body.message).to.equal('Invalid Username or Password');
     });
-  });
-
-  describe('POST /auth/login', () => {
     it('returns a 401 with an invalid password', async () => {
       const invalidUser = {
         username: 'steve',
@@ -138,9 +135,6 @@ describe('Login Suite', () => {
         .expect(401);
       expect(response.body.message).to.equal('Invalid Username or Password');
     });
-  });
-
-  describe('POST /auth/login', () => {
     it('returns a token when logged in with valid credentials', async () => {
       const newUser = {
         username: 'steve',

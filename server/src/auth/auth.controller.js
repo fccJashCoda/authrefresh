@@ -1,4 +1,3 @@
-const express = require('express');
 const Joi = require('joi');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -19,9 +18,9 @@ const returnError = (code, res, next) => {
   next(error);
 };
 
-const router = express.Router();
 const schema = Joi.object({
-  username: Joi.string().alphanum().min(3).max(20).required(),
+  username: Joi.string().alphanum().min(3).max(20)
+    .required(),
   password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9_]{8,30}$')).required(),
 });
 
@@ -42,25 +41,22 @@ const createTokenSendResponse = (user, res, next) => {
         token,
         user: user.username,
       });
-    }
+    },
   );
 };
 
-router.get('/', (req, res) => {
+const get = (req, res) => {
   res.json({
     message: 'auth router 🐾',
     user: req.user,
   });
-});
+};
 
-router.get('/science', (req, res, next) => {
+const science = (req, res, next) => {
   returnError(418, res, next);
-});
+};
 
-// @POST /signup
-// @desc create a new account
-// @access public
-router.post('/signup', (req, res, next) => {
+const signup = (req, res, next) => {
   const { username, password } = req.body;
 
   const value = schema.validate({ username, password });
@@ -90,12 +86,9 @@ router.post('/signup', (req, res, next) => {
         returnError(500, res, next);
       });
   });
-});
+};
 
-// @POST /login
-// @desc login an account
-// @access public
-router.post('/login', (req, res, next) => {
+const login = (req, res, next) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
@@ -120,6 +113,11 @@ router.post('/login', (req, res, next) => {
     .catch(() => {
       returnError(500, res, next);
     });
-});
+};
 
-module.exports = router;
+module.exports = {
+  get,
+  science,
+  signup,
+  login,
+};
