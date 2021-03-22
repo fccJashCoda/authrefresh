@@ -1,5 +1,12 @@
+const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+
+const schema = Joi.object({
+  username: Joi.string().alphanum().min(3).max(20)
+    .required(),
+  password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9_]{8,30}$')).required(),
+});
 
 function checkTokenSetUser(req, res, next) {
   const authHeader = req.get('Authorization');
@@ -36,7 +43,6 @@ function isLoggedIn(req, res, next) {
 async function isAdmin(req, res, next) {
   try {
     const user = await User.findOne({ _id: req.user._id });
-    console.log(user);
     if (user && user.role === 'admin') {
       next();
     } else {
@@ -48,8 +54,22 @@ async function isAdmin(req, res, next) {
   }
 }
 
+const validateBody = (defaultErrorMessage) => (req, res, next) => {
+  const value = schema.validate(req.body);
+  if (!value.error) {
+    next();
+  } else {
+    res.status(422);
+    const error = defaultErrorMessage
+      ? new Error(defaultErrorMessage)
+      : value.error;
+    next(error);
+  }
+};
+
 module.exports = {
   checkTokenSetUser,
   isLoggedIn,
   isAdmin,
+  validateBody,
 };

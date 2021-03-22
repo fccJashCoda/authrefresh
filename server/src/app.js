@@ -7,7 +7,7 @@ require('dotenv').config();
 const auth = require('./auth/auth.routes');
 const notes = require('./api/notes');
 const users = require('./api/users');
-const middlewares = require('./auth/middleware');
+const middlewares = require('./auth/auth.middleware');
 
 const app = express();
 

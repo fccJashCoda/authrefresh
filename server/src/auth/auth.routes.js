@@ -1,21 +1,29 @@
 const express = require('express');
+const middleware = require('./auth.middleware');
 
 const controller = require('./auth.controller');
 
 const router = express.Router();
 
+const foo = (message) => (req, res, next) => {
+  if (req.params.test === 'fish') {
+    next();
+  } else {
+    const error = new Error(message || 'bar');
+    next(error);
+  }
+};
+
 router.get('/', controller.get);
 
 router.get('/science', controller.science);
 
-// @POST /signup
-// @desc create a new account
-// @access public
-router.post('/signup', controller.signup);
+router.post('/signup', middleware.validateBody(), controller.signup);
 
-// @POST /login
-// @desc login an account
-// @access public
-router.post('/login', controller.login);
+router.post('/login', middleware.validateBody(), controller.login);
+
+router.get('/:test', foo(), (req, res) => {
+  res.json({ message: 'Goodbye and thanks for all the fish!' });
+});
 
 module.exports = router;
