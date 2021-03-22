@@ -97,9 +97,7 @@ describe('Login Suite', () => {
         .post('/auth/login')
         .send(invalidUser)
         .expect(422);
-      expect(response.body.message).to.equal(
-        '"username" is not allowed to be empty',
-      );
+      expect(response.body.message).to.equal('Unable to login');
     });
     it('returns an error if no password is provided', async () => {
       const invalidUser = {
@@ -111,9 +109,7 @@ describe('Login Suite', () => {
         .post('/auth/login')
         .send(invalidUser)
         .expect(422);
-      expect(response.body.message).to.equal(
-        '"password" is not allowed to be empty',
-      );
+      expect(response.body.message).to.equal('Unable to login');
     });
     it('returns a 401 with an invalid username', async () => {
       const invalidUser = {
