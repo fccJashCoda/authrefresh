@@ -1,24 +1,25 @@
-const express = require('express');
 const Joi = require('joi');
-const controller = require('./notes.controller');
-
-const router = express.Router();
-const Note = require('../models/Note');
+const Note = require('../../models/Note');
 
 const schema = new Joi.object({
-  title: Joi.string().trim().min(3).max(100).required(),
+  title: Joi.string().trim().min(3).max(100)
+    .required(),
   text: Joi.string().trim().required(),
 });
 
-// @route GET /api/v1/notes/
-// @desc get all notes
-// @access private
-router.get('/', controller.getAll);
+const getAll = (req, res, next) => {
+  Note.find({ user_id: req.user._id })
+    .then((notes) => {
+      res.json(notes);
+    })
+    .catch(() => {
+      const error = new Error("Nobody's home.");
+      res.status(500);
+      next(error);
+    });
+};
 
-// @route POST /api/v1/notes/
-// @desc add a new note
-// @access private
-router.post('/', (req, res, next) => {
+const postNote = (req, res, next) => {
   const { title, text } = req.body;
   const value = schema.validate({ title, text });
 
@@ -43,12 +44,9 @@ router.post('/', (req, res, next) => {
         next(error);
       });
   }
-});
+};
 
-// @POST /login
-// @desc login an account
-// @access public
-router.delete('/:id', (req, res, next) => {
+const deleteNote = (req, res, next) => {
   Note.deleteOne({ _id: req.params.id })
     .then(() => res.json({ message: `Deleted note with id: ${req.params.id}` }))
     .catch(() => {
@@ -56,6 +54,10 @@ router.delete('/:id', (req, res, next) => {
       res.status(500);
       next(error);
     });
-});
+};
 
-module.exports = router;
+module.exports = {
+  getAll,
+  postNote,
+  deleteNote,
+};

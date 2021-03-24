@@ -5,8 +5,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 require('dotenv').config();
 const auth = require('./auth/auth.routes');
-const notes = require('./api/notes');
-const users = require('./api/users');
+const notes = require('./api/notes/notes.router');
+const users = require('./api/users/users.router');
 const middlewares = require('./auth/auth.middleware');
 
 const app = express();

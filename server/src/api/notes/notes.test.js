@@ -2,7 +2,7 @@ const request = require('supertest');
 const mongoose = require('mongoose');
 const { expect } = require('chai');
 
-const app = require('../app');
+const app = require('../../app');
 
 const user = {
   username: 'steve',
