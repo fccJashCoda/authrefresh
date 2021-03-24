@@ -57,7 +57,7 @@ describe('Sign-up Suite', () => {
     before(async () => {
       await mongoose.connection.db.dropCollection('users');
     });
-    it('password should match the base regex pattern', async () => {
+    it('should return a token and username on signup success', async () => {
       const newUser = {
         username: 'steve',
         password: 'absolutely',
@@ -111,7 +111,7 @@ describe('Login Suite', () => {
         .expect(422);
       expect(response.body.message).to.equal('Unable to login');
     });
-    it('returns a 401 with an invalid username', async () => {
+    it('returns a 422 with an invalid username', async () => {
       const invalidUser = {
         username: 'STEVE',
         password: 'absolutely',
@@ -120,8 +120,8 @@ describe('Login Suite', () => {
       const response = await request(app)
         .post('/auth/login')
         .send(invalidUser)
-        .expect(401);
-      expect(response.body.message).to.equal('Invalid Username or Password');
+        .expect(422);
+      expect(response.body.message).to.equal('Unable to login');
     });
     it('returns a 401 with an invalid password', async () => {
       const invalidUser = {

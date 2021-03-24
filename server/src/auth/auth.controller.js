@@ -17,25 +17,22 @@ const returnError = (code, res, next) => {
   next(error);
 };
 
-const createTokenSendResponse = (user, res, next) => {
-  const payload = {
-    _id: user._id,
-    username: user.username,
-  };
-  jwt.sign(
-    payload,
-    process.env.SECRET_KEY,
-    { expiresIn: '1d' },
-    (err, token) => {
-      if (err) {
-        return returnError(500, res, next);
-      }
-      return res.json({
-        token,
-        user: user.username,
-      });
-    },
-  );
+const createTokenSendResponse = async (user, res, next) => {
+  try {
+    const payload = {
+      _id: user._id,
+      username: user.username,
+    };
+    const token = await jwt.sign(payload, process.env.SECRET_KEY, {
+      expiresIn: '1d',
+    });
+    res.json({
+      token,
+      user: user.username,
+    });
+  } catch (error) {
+    returnError(500, res, next);
+  }
 };
 
 const get = (req, res) => {
@@ -49,51 +46,36 @@ const science = (req, res, next) => {
   returnError(418, res, next);
 };
 
-const signup = (req, res, next) => {
-  const { username, password } = req.body;
+const signup = async (req, res, next) => {
+  try {
+    const { username, password } = req.body;
+    const salt = await bcrypt.genSalt(saltRounds);
+    const hash = await bcrypt.hash(password, salt);
+    const user = new User({
+      username,
+      password: hash,
+    });
 
-  User.findOne({ username }).then((foundUser) => {
-    if (foundUser) {
-      return returnError(409, res, next);
-    }
-    bcrypt
-      .genSalt(saltRounds)
-      .then((salt) => bcrypt.hash(password, salt))
-      .then((hash) => {
-        const user = new User({
-          username,
-          password: hash,
-        });
-
-        user.save().then((newUser) => {
-          createTokenSendResponse(newUser, res, next);
-        });
-      })
-      .catch(() => {
-        returnError(500, res, next);
-      });
-  });
+    const saved = await user.save();
+    createTokenSendResponse(saved, res, next);
+  } catch (error) {
+    returnError(500, res, next);
+  }
 };
 
-const login = (req, res, next) => {
-  const { username, password } = req.body;
-  User.findOne({ username })
-    .then((foundUser) => {
-      if (foundUser && foundUser.active) {
-        bcrypt.compare(password, foundUser.password).then((valid) => {
-          if (valid) {
-            createTokenSendResponse(foundUser, res, next);
-          } else {
-            return returnError(401, res, next);
-          }
-        });
-      } else {
-        return returnError(401, res, next);
-      }
-    })
-    .catch(() => {
-      returnError(500, res, next);
-    });
+const login = async (req, res, next) => {
+  try {
+    const { password } = req.body;
+    const user = req.loggingInUser;
+    const valid = await bcrypt.compare(password, user.password);
+    if (valid) {
+      createTokenSendResponse(user, res, next);
+    } else {
+      returnError(401, res, next);
+    }
+  } catch (error) {
+    returnError(500, res, next);
+  }
 };
 
 module.exports = {

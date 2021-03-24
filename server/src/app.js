@@ -42,10 +42,7 @@ function notFound(req, res, next) {
 
 // eslint-disable-next-line
 function errorHandler(err, req, res, next) {
-  if (res.statusCode === 200) {
-    res.status(500);
-  }
-  res.status(res.statusCode || 500);
+  res.status(res.statusCode === 200 ? 500 : res.statusCode);
   res.json({
     message: err.message,
     stack: err.stack,

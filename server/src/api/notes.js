@@ -1,29 +1,19 @@
 const express = require('express');
+const Joi = require('joi');
+const controller = require('./notes.controller');
 
 const router = express.Router();
-const Joi = require('joi');
 const Note = require('../models/Note');
 
 const schema = new Joi.object({
-  title: Joi.string().trim().min(3).max(100)
-    .required(),
+  title: Joi.string().trim().min(3).max(100).required(),
   text: Joi.string().trim().required(),
 });
 
 // @route GET /api/v1/notes/
 // @desc get all notes
 // @access private
-router.get('/', (req, res, next) => {
-  Note.find({ user_id: req.user._id })
-    .then((notes) => {
-      res.json(notes);
-    })
-    .catch(() => {
-      const error = new Error("Nobody's home.");
-      res.status(500);
-      next(error);
-    });
-});
+router.get('/', controller.getAll);
 
 // @route POST /api/v1/notes/
 // @desc add a new note
@@ -44,13 +34,11 @@ router.post('/', (req, res, next) => {
 
     newNote
       .save()
-      .then(() => {
-        res.json({ message: 'we gucci' });
+      .then((note) => {
+        res.json({ message: 'Note created', note });
       })
       .catch(() => {
-        const error = new Error(
-          'It seems the note burst into flames. Server error🧾🚬🔥',
-        );
+        const error = new Error('Server error');
         res.status(500);
         next(error);
       });
@@ -64,7 +52,7 @@ router.delete('/:id', (req, res, next) => {
   Note.deleteOne({ _id: req.params.id })
     .then(() => res.json({ message: `Deleted note with id: ${req.params.id}` }))
     .catch(() => {
-      const error = new Error('This note does not exist');
+      const error = new Error('Invalid note Id');
       res.status(500);
       next(error);
     });

@@ -67,9 +67,26 @@ const validateBody = (defaultErrorMessage) => (req, res, next) => {
   }
 };
 
+const findUser = (defaultLoginError, isError, errorCode = 422) => async (
+  req,
+  res,
+  next,
+) => {
+  const user = await User.findOne({ username: req.body.username });
+  if (isError(user)) {
+    const error = new Error(defaultLoginError);
+    res.status(errorCode);
+    next(error);
+  } else {
+    req.loggingInUser = user;
+    next();
+  }
+};
+
 module.exports = {
   checkTokenSetUser,
   isLoggedIn,
   isAdmin,
   validateBody,
+  findUser,
 };
