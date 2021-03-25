@@ -2,6 +2,7 @@ const express = require('express');
 const Joi = require('joi');
 const bcrypt = require('bcryptjs');
 const User = require('../../models/User');
+const controller = require('./users.controller');
 
 const router = express.Router();
 
@@ -12,17 +13,14 @@ const schema = Joi.object({
   active: Joi.bool(),
 });
 
-router.get('/', async (req, res, next) => {
-  try {
-    const _users = await User.find().select('-password').sort('username');
-    res.json(_users);
-  } catch (err) {
-    const error = new Error('It seems the database vanished');
-    res.status(500);
-    return next(error);
-  }
-});
+// @route GET /api/v1/users/
+// @desc get a list of all users
+// @access admin only
+router.get('/', controller.getUsers);
 
+// @route PATCH /api/v1/users/:id
+// @desc modify a user
+// @access admin only
 router.patch('/:id', async (req, res, next) => {
   try {
     const validation = schema.validate(req.body);
