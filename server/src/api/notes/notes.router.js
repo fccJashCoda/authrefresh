@@ -1,5 +1,6 @@
 const express = require('express');
 const controller = require('./notes.controller');
+const middleware = require('./notes.middleware');
 
 const router = express.Router();
 
@@ -11,11 +12,11 @@ router.get('/', controller.getAll);
 // @route POST /api/v1/notes/
 // @desc add a new note
 // @access private
-router.post('/', controller.postNote);
+router.post('/', middleware.validateBody, controller.postNote);
 
-// @POST /login
-// @desc login an account
-// @access public
+// @DELETE /api/v1/notes/:id
+// @desc delete a note with id :id
+// @access private
 router.delete('/:id', controller.deleteNote);
 
 module.exports = router;

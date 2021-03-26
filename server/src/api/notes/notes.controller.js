@@ -1,11 +1,4 @@
-const Joi = require('joi');
 const Note = require('../../models/Note');
-
-const schema = new Joi.object({
-  title: Joi.string().trim().min(3).max(100)
-    .required(),
-  text: Joi.string().trim().required(),
-});
 
 const getAll = (req, res, next) => {
   Note.find({ user_id: req.user._id })
@@ -21,29 +14,22 @@ const getAll = (req, res, next) => {
 
 const postNote = (req, res, next) => {
   const { title, text } = req.body;
-  const value = schema.validate({ title, text });
+  const newNote = new Note({
+    title,
+    text,
+    user_id: req.user._id,
+  });
 
-  if (value.error) {
-    res.status(422);
-    next(value.error);
-  } else {
-    const newNote = new Note({
-      title,
-      text,
-      user_id: req.user._id,
+  newNote
+    .save()
+    .then((note) => {
+      res.json({ message: 'Note created', note });
+    })
+    .catch(() => {
+      const error = new Error('Server error');
+      res.status(500);
+      next(error);
     });
-
-    newNote
-      .save()
-      .then((note) => {
-        res.json({ message: 'Note created', note });
-      })
-      .catch(() => {
-        const error = new Error('Server error');
-        res.status(500);
-        next(error);
-      });
-  }
 };
 
 const deleteNote = (req, res, next) => {
