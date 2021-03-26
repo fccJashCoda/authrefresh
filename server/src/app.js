@@ -11,7 +11,9 @@ const middlewares = require('./auth/auth.middleware');
 
 const app = express();
 
-app.use(morgan('tiny'));
+if (process.env.NODE_ENV !== 'test') {
+  app.use(morgan('tiny'));
+}
 app.use(express.urlencoded());
 app.use(express.json());
 app.use(

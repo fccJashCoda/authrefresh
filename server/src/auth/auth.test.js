@@ -70,7 +70,7 @@ describe('Sign-up Suite', () => {
       expect(response.body).to.have.property('token');
       expect(response.body.user).to.equal(newUser.username);
     });
-    it('should not allow you to register with an existing username', async () => {
+    it("doesn't allow registration with an existing username", async () => {
       const newUser = {
         username: 'steve',
         password: 'absolutely',

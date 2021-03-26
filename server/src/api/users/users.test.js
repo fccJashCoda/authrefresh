@@ -1,6 +1,7 @@
 const request = require('supertest');
 const { expect } = require('chai');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../../models/User');
 
 const app = require('../../app');
@@ -14,6 +15,8 @@ const admin = {
   username: 'admin',
   password: 'notadmin1234',
 };
+
+let userId = null;
 
 async function mockAdmin() {
   console.log('Seeding mock database with a mock admin');
@@ -43,9 +46,13 @@ describe('GET /api/v1/users/', () => {
       authenticatedUser
         .post('/auth/login')
         .send(regularUser)
-        .end((err, res) => {
+        .end(async (err, res) => {
           expect(res.statusCode).to.equal(200);
           token = res.body.token;
+          await jwt.verify(token, process.env.SECRET_KEY, (oops, content) => {
+            if (oops) console.log(err);
+            userId = content._id;
+          });
           done();
         });
     });
@@ -141,6 +148,60 @@ describe('PATCH /api/v1/users/:id', () => {
       expect(response.body.message).to.equal(
         'Not Found - /api/v1/users/5ead965726509e70bef52f83',
       );
+    });
+    it('returns a confirmation after a successfull operation', async () => {
+      const response = await authenticatedUser
+        .patch(`/api/v1/users/${userId}`)
+        .set('Authorization', `bearer ${token}`)
+        .expect(200);
+      expect(response.body.message).to.equal(`User with id ${userId} modified`);
+      expect(response.body).to.have.property('update');
+    });
+    it('returns a 422 if validation fails for username', async () => {
+      const response = await authenticatedUser
+        .patch(`/api/v1/users/${userId}`)
+        .set('Authorization', `bearer ${token}`)
+        .send({
+          username: 'st',
+        })
+        .expect(422);
+      expect(response.body.message).to.equal(
+        '"username" length must be at least 3 characters long',
+      );
+    });
+    it('returns a 422 if validation fails for password', async () => {
+      const response = await authenticatedUser
+        .patch(`/api/v1/users/${userId}`)
+        .set('Authorization', `bearer ${token}`)
+        .send({
+          password: 'st',
+        })
+        .expect(422);
+      expect(response.body.message).to.equal(
+        '"password" with value "st" fails to match the required pattern: /^[a-zA-Z0-9_]{8,30}$/',
+      );
+    });
+    it('returns a 422 if validation fails for roles', async () => {
+      const response = await authenticatedUser
+        .patch(`/api/v1/users/${userId}`)
+        .set('Authorization', `bearer ${token}`)
+        .send({
+          roles: 'manager',
+        })
+        .expect(422);
+      expect(response.body.message).to.equal(
+        '"roles" must be one of [user, admin]',
+      );
+    });
+    it('returns a 422 if validation fails for active', async () => {
+      const response = await authenticatedUser
+        .patch(`/api/v1/users/${userId}`)
+        .set('Authorization', `bearer ${token}`)
+        .send({
+          active: 'no',
+        })
+        .expect(422);
+      expect(response.body.message).to.equal('"active" must be a boolean');
     });
   });
 });
