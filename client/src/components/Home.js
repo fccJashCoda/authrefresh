@@ -1,6 +1,4 @@
-import { Switch, Route, Link } from 'react-router-dom';
-import Signup from './Signup';
-import Login from './Login';
+import { Link } from 'react-router-dom';
 
 function Home() {
   return (

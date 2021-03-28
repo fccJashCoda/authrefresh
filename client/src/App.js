@@ -3,6 +3,7 @@ import 'bootswatch/dist/cyborg/bootstrap.css';
 import Home from './components/Home';
 import Signup from './components/Signup';
 import Login from './components/Login';
+import Dashboard from './components/Dashboard';
 
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 
@@ -14,9 +15,6 @@ function App() {
           <Link to='/' className='navbar-brand'>
             Auth Refresher
           </Link>
-          {/* <a className='navbar-brand' href='#'>
-            Auth Refresher
-          </a> */}
           <button
             className='navbar-toggler'
             type='button'
@@ -30,26 +28,33 @@ function App() {
           </button>
           <div className='collapse navbar-collapse' id='navbarSupportedContent'>
             <ul className='navbar-nav me-auto mb-2 mb-lg-0'>
-              <li className='nav-item'>
+              {/* <li className='nav-item'>
                 <a className='nav-link active' aria-current='page' href='#'>
                   Login
                 </a>
-              </li>
+              </li> */}
             </ul>
           </div>
         </nav>
+        <main>
+          <Switch>
+            <Route exact path='/'>
+              <Home />
+            </Route>
+            <div className='container'>
+              <Route exact path='/dashboard'>
+                <Dashboard />
+              </Route>
+              <Route exact path='/login'>
+                <Login />
+              </Route>
+              <Route exact path='/signup'>
+                <Signup />
+              </Route>
+            </div>
+          </Switch>
+        </main>
       </div>
-      <Switch>
-        <Route exact path='/'>
-          <Home />
-        </Route>
-        <Route exact path='/signup'>
-          <Signup />
-        </Route>
-        <Route exact path='/login'>
-          <Login />
-        </Route>
-      </Switch>
     </Router>
   );
 }
