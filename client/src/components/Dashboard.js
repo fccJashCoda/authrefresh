@@ -1,50 +1,87 @@
+import { useState, useEffect } from 'react';
+
 function Dashboard() {
+  const [user, setUser] = useState({});
+
+  const logout = () => {
+    window.location.href = '/login';
+  };
+
+  const addNotes = () => {};
+  const deleteNotes = () => {};
+  const getNotes = async () => {
+    const response = await fetch('/api/v1/notes', {
+      Authorization: `bearer ${localStorage.getItem('token')}`,
+    });
+    const result = await response.json();
+    console.log(result);
+  };
+
+  useEffect(() => {
+    const auth = async () => {
+      const response = await fetch('/auth', {
+        headers: {
+          Authorization: `bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      const auth = await response.json();
+      if (auth.user) {
+        setUser(auth.user);
+        getNotes();
+        console.log(user);
+      } else {
+        logout();
+      }
+    };
+    auth();
+  }, []);
+
   return (
-    <section class='p-4'>
+    <section className='p-4'>
       <h1>Dashboard</h1>
       <h3>Getting user information...</h3>
-      {/* <h3 v-if="user">Welcome, {{user.username}}!</h3> */}
-      <button class='btn btn-warning mt-5'>Logout</button>
-      <button class='btn btn-info mt-5'>Toggle Form</button>
+      {user.username && <h3>Welcome, {user.username}!</h3>}
+      <button className='btn btn-warning mt-5'>Logout</button>
+      <button className='btn btn-info mt-5'>Toggle Form</button>
       <form>
-        <div class='mb-3'>
-          <label for='title' class='form-label'>
+        <div className='mb-3'>
+          <label htmlFor='title' className='form-label'>
             Title
           </label>
           <input
             required
             ype='text'
-            class='form-control'
+            className='form-control'
             id='title'
             aria-describedby='titleHelp'
             placeholder='Enter your title'
           />
-          <div id='titleHelp' class='form-text'>
+          <div id='titleHelp' className='form-text'>
             Enter a title for your note
           </div>
         </div>
-        <div class='mb-3'>
-          <label for='note' class='form-label'>
+        <div className='mb-3'>
+          <label htmlFor='note' className='form-label'>
             Note
           </label>
           <textarea
             required
-            class='form-control'
+            className='form-control'
             id='note'
             placeholder='Enter your note...'
           ></textarea>
         </div>
-        <button type='submit' class='btn btn-primary'>
+        <button type='submit' className='btn btn-primary'>
           Post note
         </button>
       </form>
-      <section class='row mt-4'>
-        <div class='col-6'>
-          <div class='card text-white border-primary mb-3'>
-            {/* <div class="card-header d-flex d-flex justify-content-between align-items-center"><span>{{note.createdAt}}</span><span class="btn btn-info">🧨</span></div> */}
-            <div class='card-body'>
-              {/* <h4 class="card-title">{{note.title}}</h4> */}
-              <p class='card-text' v-html='renderMarkdown(note.text)'></p>
+      <section className='row mt-4'>
+        <div className='col-6'>
+          <div className='card text-white border-primary mb-3'>
+            {/* <div className="card-header d-flex d-flex justify-content-between align-items-center"><span>{{note.createdAt}}</span><span className="btn btn-info">🧨</span></div> */}
+            <div className='card-body'>
+              {/* <h4 className="card-title">{{note.title}}</h4> */}
+              <p className='card-text' v-html='renderMarkdown(note.text)'></p>
             </div>
           </div>
         </div>
