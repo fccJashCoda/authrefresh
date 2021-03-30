@@ -1,27 +1,94 @@
 import { useState, useEffect } from 'react';
+import Joi from 'joi';
+
+const schema = Joi.object({
+  title: Joi.string().trim().min(3).max(100).required(),
+  text: Joi.string().trim().required(),
+});
 
 function Dashboard() {
   const [user, setUser] = useState({});
+  const [notes, setNotes] = useState([]);
+  const [title, setTitle] = useState('');
+  const [text, setText] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const logout = () => {
     window.location.href = '/login';
   };
 
-  const addNotes = () => {};
-  const deleteNotes = () => {};
+  const addNote = async (e) => {
+    e.preventDefault();
+
+    if (validNote()) {
+      const token = localStorage.getItem('token');
+      const payload = {
+        title,
+        text,
+      };
+
+      const options = {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          Authorization: `bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      };
+
+      try {
+        const response = await fetch('/api/v1/notes', options);
+        const result = await response.json();
+        console.log(result);
+        // result.note
+        // push this to the notes array
+        setNotes([result.note, ...notes]);
+      } catch (error) {
+        setErrorMessage(error.message);
+      }
+    }
+  };
+
+  const validNote = () => {
+    const valid = schema.validate({ title, text });
+
+    if (!valid.error) return true;
+
+    setErrorMessage(valid.error);
+    console.log(valid.error);
+    return false;
+  };
+
+  const deleteNote = () => {};
+
   const getNotes = async () => {
+    // this will be its own componenent later
+    const token = await localStorage.getItem('token');
     const response = await fetch('/api/v1/notes', {
-      Authorization: `bearer ${localStorage.getItem('token')}`,
+      method: 'GET',
+      headers: {
+        Authorization: `bearer ${token}`,
+      },
     });
     const result = await response.json();
-    console.log(result);
+    setNotes(result);
   };
 
   useEffect(() => {
+    console.log('notes', notes);
+  }, [notes]);
+
+  useEffect(() => {
+    setErrorMessage('');
+  }, [title, text]);
+
+  useEffect(() => {
     const auth = async () => {
+      const token = await localStorage.getItem('token');
       const response = await fetch('/auth', {
+        method: 'GET',
         headers: {
-          Authorization: `bearer ${localStorage.getItem('token')}`,
+          Authorization: `bearer ${token}`,
         },
       });
       const auth = await response.json();
@@ -49,6 +116,7 @@ function Dashboard() {
             Title
           </label>
           <input
+            onChange={(e) => setTitle(e.target.value)}
             required
             ype='text'
             className='form-control'
@@ -65,26 +133,37 @@ function Dashboard() {
             Note
           </label>
           <textarea
+            onChange={(e) => setText(e.target.value)}
             required
             className='form-control'
             id='note'
             placeholder='Enter your note...'
           ></textarea>
         </div>
-        <button type='submit' className='btn btn-primary'>
+        <button
+          onClick={(e) => addNote(e)}
+          type='submit'
+          className='btn btn-primary'
+        >
           Post note
         </button>
       </form>
       <section className='row mt-4'>
-        <div className='col-6'>
-          <div className='card text-white border-primary mb-3'>
-            {/* <div className="card-header d-flex d-flex justify-content-between align-items-center"><span>{{note.createdAt}}</span><span className="btn btn-info">🧨</span></div> */}
-            <div className='card-body'>
-              {/* <h4 className="card-title">{{note.title}}</h4> */}
-              <p className='card-text' v-html='renderMarkdown(note.text)'></p>
+        {notes.map((note) => (
+          <div className='col-6'>
+            <div className='card text-white border-primary mb-3'>
+              <div className='card-header d-flex d-flex justify-content-between align-items-center'>
+                <span>{note.createdAt}</span>
+                <span className='btn btn-info'>🧨</span>
+              </div>
+              <div className='card-body'>
+                <h4 className='card-title'>{note.title}</h4>
+                {/* <p className='card-text' v-html='renderMarkdown(note.text)'></p> */}
+                <p className='card-text'>{note.text}</p>
+              </div>
             </div>
           </div>
-        </div>
+        ))}
       </section>
     </section>
   );

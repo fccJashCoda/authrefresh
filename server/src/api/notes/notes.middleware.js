@@ -1,8 +1,7 @@
 const Joi = require('joi');
 
 const schema = new Joi.object({
-  title: Joi.string().trim().min(3).max(100)
-    .required(),
+  title: Joi.string().trim().min(3).max(100).required(),
   text: Joi.string().trim().required(),
 });
 
