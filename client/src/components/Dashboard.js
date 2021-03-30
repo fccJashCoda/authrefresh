@@ -13,8 +13,10 @@ function Dashboard() {
   const [title, setTitle] = useState('');
   const [text, setText] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [showForm, setShowForm] = useState(true);
 
   const logout = () => {
+    localStorage.removeItem('token');
     window.location.href = '/login';
   };
 
@@ -71,7 +73,6 @@ function Dashboard() {
       console.log(result);
       if (response.status === 200) {
         const newNotes = notes.filter((note) => note._id !== id);
-        console.log('filtered: ', newNotes);
         setNotes(newNotes);
       }
     } catch (error) {
@@ -90,6 +91,11 @@ function Dashboard() {
     });
     const result = await response.json();
     setNotes(result);
+  };
+
+  const toggleForm = () => {
+    setShowForm(!showForm);
+    console.log('form: ', showForm);
   };
 
   useEffect(() => {
@@ -123,49 +129,63 @@ function Dashboard() {
   return (
     <section className='p-4'>
       <h1>Dashboard</h1>
-      <h3>Getting user information...</h3>
-      {user.username && <h3>Welcome, {user.username}!</h3>}
-      <button className='btn btn-warning mt-5'>Logout</button>
-      <button className='btn btn-info mt-5'>Toggle Form</button>
-      <form>
-        <div className='mb-3'>
-          <label htmlFor='title' className='form-label'>
-            Title
-          </label>
-          <input
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            ype='text'
-            className='form-control'
-            id='title'
-            aria-describedby='titleHelp'
-            placeholder='Enter your title'
-          />
-          <div id='titleHelp' className='form-text'>
-            Enter a title for your note
+      {user.username ? (
+        <h3>Welcome, {user.username}!</h3>
+      ) : (
+        <h3>Getting user information...</h3>
+      )}
+      <button className='btn btn-warning mt-5' onClick={logout}>
+        Logout
+      </button>
+      <button className='btn btn-info mt-5' onClick={toggleForm}>
+        Toggle Form
+      </button>
+      {errorMessage && (
+        <div className='alert alert-danger' role='alert'>
+          {errorMessage}
+        </div>
+      )}
+      {showForm && (
+        <form>
+          <div className='mb-3'>
+            <label htmlFor='title' className='form-label'>
+              Title
+            </label>
+            <input
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              ype='text'
+              className='form-control'
+              id='title'
+              aria-describedby='titleHelp'
+              placeholder='Enter your title'
+            />
+            <div id='titleHelp' className='form-text'>
+              Enter a title for your note
+            </div>
           </div>
-        </div>
-        <div className='mb-3'>
-          <label htmlFor='note' className='form-label'>
-            Note
-          </label>
-          <textarea
-            onChange={(e) => setText(e.target.value)}
-            required
-            rows='4'
-            className='form-control'
-            id='note'
-            placeholder='Enter your note...'
-          ></textarea>
-        </div>
-        <button
-          onClick={(e) => addNote(e)}
-          type='submit'
-          className='btn btn-primary'
-        >
-          Post note
-        </button>
-      </form>
+          <div className='mb-3'>
+            <label htmlFor='note' className='form-label'>
+              Note
+            </label>
+            <textarea
+              onChange={(e) => setText(e.target.value)}
+              required
+              rows='4'
+              className='form-control'
+              id='note'
+              placeholder='Enter your note...'
+            ></textarea>
+          </div>
+          <button
+            onClick={(e) => addNote(e)}
+            type='submit'
+            className='btn btn-primary'
+          >
+            Post note
+          </button>
+        </form>
+      )}
       <section className='row mt-4'>
         {notes.map((note) => (
           <div className='col-6' key={note._id}>
