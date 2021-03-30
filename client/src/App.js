@@ -1,9 +1,9 @@
 import './App.css';
 import 'bootswatch/dist/cyborg/bootstrap.css';
-import Home from './components/Home';
-import Signup from './components/Signup';
-import Login from './components/Login';
-import Dashboard from './components/Dashboard';
+import Home from './layout/Home';
+import Signup from './layout/Signup';
+import Login from './layout/Login';
+import Dashboard from './layout/Dashboard';
 
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 

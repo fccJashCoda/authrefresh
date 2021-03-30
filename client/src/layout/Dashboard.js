@@ -55,7 +55,6 @@ function Dashboard() {
     if (!valid.error) return true;
 
     setErrorMessage(valid.error);
-    console.log(valid.error);
     return false;
   };
 
@@ -97,10 +96,6 @@ function Dashboard() {
     setShowForm(!showForm);
     console.log('form: ', showForm);
   };
-
-  useEffect(() => {
-    console.log('notes', notes);
-  }, [notes]);
 
   useEffect(() => {
     setErrorMessage('');
