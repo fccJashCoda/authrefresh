@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Joi from 'joi';
-import ReactMarkdown from 'react-markdown';
+import NoteContainer from '../components/NoteContainer';
 
 const schema = Joi.object({
   title: Joi.string().trim().min(3).max(100).required(),
@@ -58,29 +58,7 @@ function Dashboard() {
     return false;
   };
 
-  const deleteNote = async (id) => {
-    const token = localStorage.getItem('token');
-    const options = {
-      method: 'DELETE',
-      headers: {
-        Authorization: `bearer ${token}`,
-      },
-    };
-    try {
-      const response = await fetch(`/api/v1/notes/${id}`, options);
-      const result = await response.json();
-      console.log(result);
-      if (response.status === 200) {
-        const newNotes = notes.filter((note) => note._id !== id);
-        setNotes(newNotes);
-      }
-    } catch (error) {
-      setErrorMessage(error.message);
-    }
-  };
-
   const getNotes = async () => {
-    // this will be its own componenent later
     const token = await localStorage.getItem('token');
     const response = await fetch('/api/v1/notes', {
       method: 'GET',
@@ -181,27 +159,7 @@ function Dashboard() {
           </button>
         </form>
       )}
-      <section className='row mt-4'>
-        {notes.map((note) => (
-          <div className='col-6' key={note._id}>
-            <div className='card text-white border-primary mb-3'>
-              <div className='card-header d-flex d-flex justify-content-between align-items-center'>
-                <span>{note.createdAt}</span>
-                <span
-                  className='btn btn-info'
-                  onClick={() => deleteNote(note._id)}
-                >
-                  🧨
-                </span>
-              </div>
-              <div className='card-body'>
-                <h4 className='card-title'>{note.title}</h4>
-                <ReactMarkdown className='card-text'>{note.text}</ReactMarkdown>
-              </div>
-            </div>
-          </div>
-        ))}
-      </section>
+      <NoteContainer notes={notes} />
     </section>
   );
 }

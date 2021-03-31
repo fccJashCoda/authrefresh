@@ -8,7 +8,7 @@ function NoteContainer(props) {
   return (
     <section className='row mt-4'>
       {notes.map((note) => (
-        <NoteComoponent note={note} />
+        <NoteComoponent note={note} key={note._id} />
       ))}
     </section>
   );

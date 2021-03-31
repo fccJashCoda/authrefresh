@@ -82,6 +82,27 @@ function Signup() {
     setErrorMessage('');
   }, [username, password, confirmPassword]);
 
+  useEffect(() => {
+    const auth = async (token) => {
+      const response = await fetch('/auth', {
+        method: 'GET',
+        headers: {
+          Authorization: `bearer ${token}`,
+        },
+      });
+      const auth = await response.json();
+      if (auth.user) {
+        window.location.href = '/dashboard';
+      }
+    };
+    const token = localStorage.getItem('token');
+    console.log('token', token);
+    if (token) {
+      console.log('trigger');
+      auth(token);
+    }
+  }, []);
+
   return (
     <section>
       {isLoading && <Loader />}

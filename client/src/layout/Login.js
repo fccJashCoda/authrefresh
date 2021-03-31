@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import Loader from '../components/Loader';
 import Joi from 'joi';
 
+import InputComponent from '../components/InputComponent';
+
 const schema = Joi.object({
   username: Joi.string().alphanum().min(3).max(30).required(),
   password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9_]{8,30}$')).required(),
@@ -70,6 +72,25 @@ function Login() {
     setErrorMessage('');
   }, [username, password]);
 
+  useEffect(() => {
+    const auth = async (token) => {
+      const response = await fetch('/auth', {
+        method: 'GET',
+        headers: {
+          Authorization: `bearer ${token}`,
+        },
+      });
+      const auth = await response.json();
+      if (auth.user) {
+        window.location.href = '/dashboard';
+      }
+    };
+    const token = localStorage.getItem('token');
+    if (token) {
+      auth(token);
+    }
+  }, []);
+
   return (
     <section>
       {isLoading && <Loader />}
@@ -82,7 +103,14 @@ function Login() {
             </div>
           )}
           <div className='mb-3'>
-            <label htmlFor='username' className='form-label'>
+            <InputComponent
+              name='username'
+              title='username'
+              action={setUsername}
+              message='do the thing'
+              placeholder='Enter username'
+            />
+            {/* <label htmlFor='username' className='form-label'>
               Username
             </label>
             <input
@@ -97,11 +125,19 @@ function Login() {
             />
             <small id='usernameHelp' className='form-text text-muted'>
               Enter your username to login.
-            </small>
+            </small> */}
           </div>
           <div className='row mb-3'>
             <div className='col'>
-              <label htmlFor='password' className='form-label'>
+              <InputComponent
+                title='Password'
+                type='password'
+                name='password'
+                message='password goes brr'
+                action={setPassword}
+                placeholder='Password'
+              />
+              {/* <label htmlFor='password' className='form-label'>
                 Password
               </label>
               <input
@@ -116,7 +152,7 @@ function Login() {
               />
               <small id='passwordHelp' className='form-text text-muted'>
                 Enter your password to login.
-              </small>
+              </small> */}
             </div>
           </div>
           <button type='submit' className='btn btn-primary mb-5'>
