@@ -142,6 +142,9 @@ function Dashboard() {
               id='note'
               placeholder='Enter your note...'
             ></textarea>
+            <small id={`noteHelp`} className='form-text text-muted'>
+              Enter the text description of you note.
+            </small>
           </div>
           <button
             onClick={(e) => addNote(e)}

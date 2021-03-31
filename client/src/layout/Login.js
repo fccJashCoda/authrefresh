@@ -57,7 +57,8 @@ function Login() {
             localStorage.setItem('token', result.token);
             window.location.href = '/dashboard';
           } else {
-            throw new Error('Invalid Username or Password');
+            setErrorMessage('Invalid Username or Password');
+            setIsLoading(false);
           }
         }, 1500);
       } catch (error) {

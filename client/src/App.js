@@ -4,6 +4,7 @@ import Home from './layout/Home';
 import Signup from './layout/Signup';
 import Login from './layout/Login';
 import Dashboard from './layout/Dashboard';
+import NotFound from './page/404';
 
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 
@@ -52,6 +53,9 @@ function App() {
                 <Signup />
               </Route>
             </div>
+            <Route path='/'>
+              <NotFound />
+            </Route>
           </Switch>
         </main>
       </div>
