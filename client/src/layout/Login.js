@@ -15,8 +15,6 @@ function Login() {
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  console.log(password);
-
   const validateUser = () => {
     const result = schema.validate({ username, password });
 
@@ -91,6 +89,11 @@ function Login() {
     }
   }, []);
 
+  const loginHelp = {
+    username: 'Enter your username to login.',
+    password: 'Enter your password to login.',
+  };
+
   return (
     <section>
       {isLoading && <Loader />}
@@ -105,54 +108,22 @@ function Login() {
           <div className='mb-3'>
             <InputComponent
               name='username'
-              title='username'
+              title='Username'
               action={setUsername}
-              message='do the thing'
               placeholder='Enter username'
+              message={loginHelp.username}
             />
-            {/* <label htmlFor='username' className='form-label'>
-              Username
-            </label>
-            <input
-              onChange={(e) => setUsername(e.target.value)}
-              type='text'
-              required
-              className='form-control'
-              aria-describedby='usernameHelp'
-              id='username'
-              name='username'
-              placeholder='Enter username'
-            />
-            <small id='usernameHelp' className='form-text text-muted'>
-              Enter your username to login.
-            </small> */}
           </div>
           <div className='row mb-3'>
             <div className='col'>
               <InputComponent
+                name='password'
                 title='Password'
                 type='password'
-                name='password'
-                message='password goes brr'
                 action={setPassword}
                 placeholder='Password'
+                message={loginHelp.username}
               />
-              {/* <label htmlFor='password' className='form-label'>
-                Password
-              </label>
-              <input
-                onChange={(e) => setPassword(e.target.value)}
-                type='password'
-                required
-                className='form-control'
-                aria-describedby='passwordHelp'
-                id='password'
-                name='password'
-                placeholder='Password'
-              />
-              <small id='passwordHelp' className='form-text text-muted'>
-                Enter your password to login.
-              </small> */}
             </div>
           </div>
           <button type='submit' className='btn btn-primary mb-5'>

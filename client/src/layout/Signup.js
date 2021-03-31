@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Joi from 'joi';
 import Loader from '../components/Loader';
+import Inputcomponent from '../components/InputComponent';
 
 const schema = Joi.object({
   username: Joi.string().alphanum().min(3).max(30).required(),
@@ -96,12 +97,17 @@ function Signup() {
       }
     };
     const token = localStorage.getItem('token');
-    console.log('token', token);
     if (token) {
-      console.log('trigger');
       auth(token);
     }
   }, []);
+
+  const signupHelp = {
+    username:
+      'Username must be longer than two characters and shorter than 30. Username must be alphanumeric, underscores are allowed.',
+    password: 'Password must be at least 10 characters.',
+    confirmPassword: 'Please confirm password',
+  };
 
   return (
     <section>
@@ -113,60 +119,34 @@ function Signup() {
             <div className='alert alert-danger'>{errorMessage}</div>
           )}
           <div className='mb-3'>
-            <label htmlFor='username' className='form-label'>
-              Username
-            </label>
-            <input
-              onChange={(e) => setUsername(e.target.value)}
-              type='text'
-              required
-              className='form-control'
-              aria-describedby='usernameHelp'
-              id='username'
+            <Inputcomponent
               name='username'
+              title='Username'
               placeholder='Enter username'
+              action={setUsername}
+              message={signupHelp.username}
             />
-            <small id='usernameHelp' className='form-text text-muted'>
-              Username must be longer than two characters and shorter than 30.
-              Username must be alphanumeric, underscores are allowed.
-            </small>
           </div>
           <div className='row mb-3'>
             <div className='col'>
-              <label htmlFor='password' className='form-label'>
-                Password
-              </label>
-              <input
-                onChange={(e) => setPassword(e.target.value)}
+              <Inputcomponent
                 type='password'
-                required
-                className='form-control'
-                aria-describedby='passwordHelp'
-                id='password'
                 name='password'
+                title='Password'
                 placeholder='Password'
+                action={setPassword}
+                message={signupHelp.password}
               />
-              <small id='passwordHelp' className='form-text text-muted'>
-                Password must be at least 10 characters
-              </small>
             </div>
             <div className='col'>
-              <label htmlFor='confirmPassword' className='form-label'>
-                Confirm Password
-              </label>
-              <input
-                onChange={(e) => setConfirmPassword(e.target.value)}
+              <Inputcomponent
                 type='password'
-                required
-                className='form-control'
-                aria-describedby='confirmPasswordHelp'
-                id='confirmPassword'
                 name='confirmPassword'
+                title='Confirm Password'
                 placeholder='Confirm Password'
+                action={setConfirmPassword}
+                message={signupHelp.confirmPassword}
               />
-              <small id='confirmPasswordHelp' className='form-text text-muted'>
-                Please confirm password
-              </small>
             </div>
           </div>
           <button type='submit' className='btn btn-primary mb-5'>

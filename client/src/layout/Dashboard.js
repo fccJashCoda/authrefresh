@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Joi from 'joi';
 import NoteContainer from '../components/NoteContainer';
+import InputComponent from '../components/InputComponent';
 
 const schema = Joi.object({
   title: Joi.string().trim().min(3).max(100).required(),
@@ -121,21 +122,13 @@ function Dashboard() {
       {showForm && (
         <form>
           <div className='mb-3'>
-            <label htmlFor='title' className='form-label'>
-              Title
-            </label>
-            <input
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              ype='text'
-              className='form-control'
-              id='title'
-              aria-describedby='titleHelp'
+            <InputComponent
+              name='title'
+              title='Title'
               placeholder='Enter your title'
+              action={setTitle}
+              message='Enter a title for your note'
             />
-            <div id='titleHelp' className='form-text'>
-              Enter a title for your note
-            </div>
           </div>
           <div className='mb-3'>
             <label htmlFor='note' className='form-label'>
