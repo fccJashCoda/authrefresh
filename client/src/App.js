@@ -42,18 +42,16 @@ function App() {
             <Route exact path='/'>
               <Home />
             </Route>
-            <div className='container'>
-              <Route exact path='/dashboard'>
-                <Dashboard />
-              </Route>
-              <Route exact path='/login'>
-                <Login />
-              </Route>
-              <Route exact path='/signup'>
-                <Signup />
-              </Route>
-            </div>
-            <Route path='/'>
+            <Route exact path='/dashboard'>
+              <Dashboard />
+            </Route>
+            <Route exact path='/login'>
+              <Login />
+            </Route>
+            <Route exact path='/signup'>
+              <Signup />
+            </Route>
+            <Route path='*'>
               <NotFound />
             </Route>
           </Switch>

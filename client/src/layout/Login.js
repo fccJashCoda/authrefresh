@@ -96,7 +96,7 @@ function Login() {
   };
 
   return (
-    <section>
+    <section className='container'>
       {isLoading && <Loader />}
       {!isLoading && (
         <form onSubmit={(e) => login(e)} className='mt-3'>

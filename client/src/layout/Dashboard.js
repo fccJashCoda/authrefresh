@@ -101,7 +101,7 @@ function Dashboard() {
   }, []);
 
   return (
-    <section className='p-4'>
+    <section className='p-4 container'>
       <h1>Dashboard</h1>
       {user.username ? (
         <h3>Welcome, {user.username}!</h3>

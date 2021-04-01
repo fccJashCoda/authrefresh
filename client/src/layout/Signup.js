@@ -110,7 +110,7 @@ function Signup() {
   };
 
   return (
-    <section>
+    <section className='container'>
       {isLoading && <Loader />}
       {!isLoading && (
         <form onSubmit={(e) => signup(e)} className='mt-3'>
