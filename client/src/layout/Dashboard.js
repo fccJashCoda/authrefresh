@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Joi from 'joi';
 import NoteContainer from '../components/NoteContainer';
 import InputComponent from '../components/InputComponent';
+import { useAuth } from '../router/ProvideAuth';
 
 const schema = Joi.object({
   title: Joi.string().trim().min(3).max(100).required(),
@@ -15,6 +16,8 @@ function Dashboard() {
   const [text, setText] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [showForm, setShowForm] = useState(true);
+
+  const auth = useAuth();
 
   const logout = () => {
     localStorage.removeItem('token');
@@ -81,33 +84,38 @@ function Dashboard() {
   }, [title, text]);
 
   useEffect(() => {
-    const auth = async () => {
-      const token = await localStorage.getItem('token');
-      const response = await fetch('/auth', {
-        method: 'GET',
-        headers: {
-          Authorization: `bearer ${token}`,
-        },
-      });
-      const auth = await response.json();
-      if (auth.user) {
-        setUser(auth.user);
-        getNotes();
-      } else {
-        logout();
-      }
-    };
-    auth();
+    // const auth = async () => {
+    //   const token = await localStorage.getItem('token');
+    //   const response = await fetch('/auth', {
+    //     method: 'GET',
+    //     headers: {
+    //       Authorization: `bearer ${token}`,
+    //     },
+    //   });
+    //   const auth = await response.json();
+    //   if (auth.user) {
+    //     setUser(auth.user);
+    //     getNotes();
+    //   } else {
+    //     logout();
+    //   }
+    // };
+    // auth();
   }, []);
 
   return (
     <section className='p-4 container'>
       <h1>Dashboard</h1>
-      {user.username ? (
-        <h3>Welcome, {user.username}!</h3>
+      {auth.user ? (
+        <h3>Welcome, {auth.user.user}!</h3>
       ) : (
         <h3>Getting user information...</h3>
       )}
+      {/* {user.username ? (
+        <h3>Welcome, {user.username}!</h3>
+      ) : (
+        <h3>Getting user information...</h3>
+      )} */}
       <button className='btn btn-warning mt-5' onClick={logout}>
         Logout
       </button>

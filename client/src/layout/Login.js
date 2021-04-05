@@ -4,6 +4,8 @@ import Joi from 'joi';
 // import useProvideAuth from '../router/useProvideAuth';
 import { useAuth } from '../router/ProvideAuth';
 import { useLocation, useHistory } from 'react-router-dom';
+import axios from 'axios';
+import tokenBridge from '../router/tokenBridge';
 
 import InputComponent from '../components/InputComponent';
 
@@ -11,6 +13,9 @@ const schema = Joi.object({
   username: Joi.string().alphanum().min(3).max(30).required(),
   password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9_]{8,30}$')).required(),
 });
+
+const temptoken =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MDUzZTU2MjQwY2VkNzZhOGNhYzM5MDciLCJ1c2VybmFtZSI6IlN1cGVydXNlciIsImlhdCI6MTYxNzY1Njk0MywiZXhwIjoxNjE3NzQzMzQzfQ.oYhvP90c7jzi6PjO3CPeHx4VBRsTSfnFAtHdJ8amACY';
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -34,36 +39,39 @@ function Login() {
     }
     return false;
   };
-
-  const { from } = location.state || { from: { pathname: '/' } };
-  const redir = () => {
-    history.replace(from);
-  };
-
+  // const { from } = location.state || { from: { pathname: '/' } };
+  // const redir = () => {
+  //   history.replace(from);
+  // };
   const login = async (e) => {
     e.preventDefault();
 
     if (validateUser()) {
-      setIsLoading(true);
-      try {
-        const response = await auth.signin(username, password, redir);
-        await setTimeout(() => {
-          if (response.error) {
-            setIsLoading(false);
-            setErrorMessage(response.error);
-          } else {
-            console.log('res', response);
-            console.log('user', auth.user);
-            console.log('error: ', response.error);
-            console.log('auth: ', auth);
-            history.push('/dashboard');
-            setIsLoading(false);
-          }
-        }, 1000);
-      } catch (error) {
-        console.log('ERROR:', error);
-      }
-
+      auth.setUser({ username: 'garblegarble' });
+      tokenBridge.setToken(temptoken);
+      console.log('axios: ', axios);
+      console.log(auth.setHeader);
+      console.log('ok we should be logged in');
+      history.push('/dashboard');
+      // setIsLoading(true);
+      // try {
+      //   const response = await auth.signin(username, password, redir);
+      //   await setTimeout(() => {
+      //     if (response.error) {
+      //       setIsLoading(false);
+      //       setErrorMessage(response.error);
+      //     } else {
+      //       console.log('res', response);
+      //       console.log('user', auth.user);
+      //       console.log('error: ', response.error);
+      //       console.log('auth: ', auth);
+      //       history.push('/dashboard');
+      //       setIsLoading(false);
+      //     }
+      //   }, 1000);
+      // } catch (error) {
+      //   console.log('ERROR:', error);
+      // }
       // await auth.signin(username, password).then((res) => {
       //   setTimeout(() => {
       //     if (res.error) {
@@ -91,13 +99,10 @@ function Login() {
       //   }, 1000);
       // });
       // const API_URL = '/auth/login';
-
       // const payload = {
-
       //   username,
       //   password,
       // };
-
       // const options = {
       //   method: 'POST',
       //   headers: {
@@ -105,11 +110,9 @@ function Login() {
       //   },
       //   body: JSON.stringify(payload),
       // };
-
       // try {
       //   const response = await fetch(API_URL, options);
       //   const result = await response.json();
-
       //   setIsLoading(true);
       //   setTimeout(() => {
       //     if (response.status === 200) {
@@ -148,6 +151,10 @@ function Login() {
   //     auth(token);
   //   }
   // }, []);
+
+  if (auth.user) {
+    history.push('/');
+  }
 
   const loginHelp = {
     username: 'Enter your username to login.',
