@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import Loader from '../components/Loader';
 import Joi from 'joi';
-// import useProvideAuth from '../router/useProvideAuth';
 import { useAuth } from '../router/ProvideAuth';
 import { useLocation, useHistory } from 'react-router-dom';
 import axios from 'axios';
@@ -47,12 +46,29 @@ function Login() {
     e.preventDefault();
 
     if (validateUser()) {
-      auth.setUser({ username: 'garblegarble' });
-      tokenBridge.setToken(temptoken);
-      console.log('axios: ', axios);
-      console.log(auth.setHeader);
-      console.log('ok we should be logged in');
-      history.push('/dashboard');
+      // auth.setUser({ username: 'garblegarble' });
+      // tokenBridge.setToken(temptoken);
+      // console.log('axios: ', axios);
+      // console.log(auth.setHeader);
+      // console.log('ok we should be logged in');
+      // history.push('/dashboard');
+
+      const API_URL = '/auth/login';
+      try {
+        const response = await axios.post(API_URL, {
+          username: username,
+          password: password,
+        });
+        if (response.status === 200) {
+          console.log('response: ', response);
+          tokenBridge.setToken(response.data.token);
+          auth.setUser(response.data.user);
+          // history.push('/dashboard');
+        }
+      } catch (error) {
+        console.log(error.message);
+      }
+
       // setIsLoading(true);
       // try {
       //   const response = await auth.signin(username, password, redir);
