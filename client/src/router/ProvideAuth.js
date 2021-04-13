@@ -19,24 +19,28 @@ function ProvideAuth({ children }) {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    setTimeout(() => {
-      console.log('deleting your stuff!');
-      setUser(null);
-    }, 30000);
-  }, []);
+    console.log('user logged in: ', user);
+  }, [user]);
 
-  useEffect(() => {
-    const sayHi = async () => {
-      axios
-        .get('/api/v1/notes')
-        .then((data) => {
-          console.log(data);
-          console.log('hitting the front page');
-        })
-        .catch((err) => console.log(err.message));
-    };
-    setTimeout(() => sayHi(), 30000);
-  }, []);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     console.log('deleting your stuff!');
+  //     setUser(null);
+  //   }, 30000);
+  // }, []);
+
+  // useEffect(() => {
+  //   const sayHi = async () => {
+  //     axios
+  //       .get('/api/v1/notes')
+  //       .then((data) => {
+  //         console.log(data);
+  //         console.log('hitting the front page');
+  //       })
+  //       .catch((err) => console.log(err.message));
+  //   };
+  //   setTimeout(() => sayHi(), 30000);
+  // }, []);
 
   return (
     <authContext.Provider value={{ user, setUser }}>

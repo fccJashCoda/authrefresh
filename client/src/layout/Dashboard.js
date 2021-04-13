@@ -81,6 +81,7 @@ function Dashboard() {
 
   useEffect(() => {
     setErrorMessage('');
+    console.log(auth.user);
   }, [title, text]);
 
   useEffect(() => {

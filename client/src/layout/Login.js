@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Loader from '../components/Loader';
 import Joi from 'joi';
 import { useAuth } from '../router/ProvideAuth';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 import tokenBridge from '../router/tokenBridge';
 
@@ -13,9 +13,6 @@ const schema = Joi.object({
   password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9_]{8,30}$')).required(),
 });
 
-const temptoken =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MDUzZTU2MjQwY2VkNzZhOGNhYzM5MDciLCJ1c2VybmFtZSI6IlN1cGVydXNlciIsImlhdCI6MTYxNzY1Njk0MywiZXhwIjoxNjE3NzQzMzQzfQ.oYhvP90c7jzi6PjO3CPeHx4VBRsTSfnFAtHdJ8amACY';
-
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -23,7 +20,6 @@ function Login() {
   const [isLoading, setIsLoading] = useState(false);
 
   const auth = useAuth();
-  const location = useLocation();
   const history = useHistory();
 
   const validateUser = () => {
@@ -38,135 +34,37 @@ function Login() {
     }
     return false;
   };
-  // const { from } = location.state || { from: { pathname: '/' } };
-  // const redir = () => {
-  //   history.replace(from);
-  // };
+
   const login = async (e) => {
     e.preventDefault();
 
     if (validateUser()) {
-      // auth.setUser({ username: 'garblegarble' });
-      // tokenBridge.setToken(temptoken);
-      // console.log('axios: ', axios);
-      // console.log(auth.setHeader);
-      // console.log('ok we should be logged in');
-      // history.push('/dashboard');
-
-      const API_URL = '/auth/login';
       try {
+        setIsLoading(true);
+        const API_URL = '/auth/login';
         const response = await axios.post(API_URL, {
           username: username,
           password: password,
         });
+        console.log('response before throw', response);
         if (response.status === 200) {
           console.log('response: ', response);
           tokenBridge.setToken(response.data.token);
           auth.setUser(response.data.user);
-          // history.push('/dashboard');
+          history.push('/dashboard');
+        } else {
+          console.log('error: ', response);
         }
       } catch (error) {
-        console.log(error.message);
+        setIsLoading(false);
+        setErrorMessage(error.response.data.message);
       }
-
-      // setIsLoading(true);
-      // try {
-      //   const response = await auth.signin(username, password, redir);
-      //   await setTimeout(() => {
-      //     if (response.error) {
-      //       setIsLoading(false);
-      //       setErrorMessage(response.error);
-      //     } else {
-      //       console.log('res', response);
-      //       console.log('user', auth.user);
-      //       console.log('error: ', response.error);
-      //       console.log('auth: ', auth);
-      //       history.push('/dashboard');
-      //       setIsLoading(false);
-      //     }
-      //   }, 1000);
-      // } catch (error) {
-      //   console.log('ERROR:', error);
-      // }
-      // await auth.signin(username, password).then((res) => {
-      //   setTimeout(() => {
-      //     if (res.error) {
-      //       setIsLoading(false);
-      //       setErrorMessage(res.error);
-      //     } else {
-      //       console.log('res', res);
-      //       console.log('user', auth.user);
-      //       console.log('error: ', res.error);
-      //       setIsLoading(false);
-      //     }
-      //   }, 1000);
-      // });
-      // await auth.signin(username, password).then((res) => {
-      //   setTimeout(() => {
-      //     if (res.error) {
-      //       setIsLoading(false);
-      //       setErrorMessage(res.error);
-      //     } else {
-      //       console.log('res', res);
-      //       console.log('user', auth.user);
-      //       console.log('error: ', res.error);
-      //       setIsLoading(false);
-      //     }
-      //   }, 1000);
-      // });
-      // const API_URL = '/auth/login';
-      // const payload = {
-      //   username,
-      //   password,
-      // };
-      // const options = {
-      //   method: 'POST',
-      //   headers: {
-      //     'content-type': 'application/json',
-      //   },
-      //   body: JSON.stringify(payload),
-      // };
-      // try {
-      //   const response = await fetch(API_URL, options);
-      //   const result = await response.json();
-      //   setIsLoading(true);
-      //   setTimeout(() => {
-      //     if (response.status === 200) {
-      //       localStorage.setItem('token', result.token);
-      //       window.location.href = '/dashboard';
-      //     } else {
-      //       setErrorMessage('Invalid Username or Password');
-      //       setIsLoading(false);
-      //     }
-      //   }, 1500);
-      // } catch (error) {
-      //   setErrorMessage(error.message);
-      // }
     }
   };
 
   useEffect(() => {
     setErrorMessage('');
   }, [username, password]);
-
-  // useEffect(() => {
-  //   const auth = async (token) => {
-  //     const response = await fetch('/auth', {
-  //       method: 'GET',
-  //       headers: {
-  //         Authorization: `bearer ${token}`,
-  //       },
-  //     });
-  //     const auth = await response.json();
-  //     if (auth.user) {
-  //       window.location.href = '/dashboard';
-  //     }
-  //   };
-  //   const token = localStorage.getItem('token');
-  //   if (token) {
-  //     auth(token);
-  //   }
-  // }, []);
 
   if (auth.user) {
     history.push('/');
