@@ -1,10 +1,15 @@
+import { useContext } from 'react';
+import { UserContext } from '../hooks/UserContext';
 import { Link } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import useLogout from '../hooks/useLogout';
 
 function Home() {
+  const { user } = useContext(UserContext);
   const { loginUser } = useAuth();
   const { logoutUser } = useLogout();
+
+  console.log('current user: ', user);
 
   return (
     <>
@@ -22,8 +27,11 @@ function Home() {
               Login
             </Link>
           </p>
-          <button onClick={() => loginUser()}>loginUser</button>
-          <button onClick={() => logoutUser()}>logoutUser</button>
+          {user ? (
+            <button onClick={() => logoutUser()}>logoutUser</button>
+          ) : (
+            <button onClick={() => loginUser()}>loginUser</button>
+          )}
         </div>
       </div>
     </>

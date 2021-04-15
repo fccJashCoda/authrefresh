@@ -8,6 +8,7 @@ const auth = require('./auth/auth.routes');
 const notes = require('./api/notes/notes.router');
 const users = require('./api/users/users.router');
 const middlewares = require('./auth/auth.middleware');
+const authv2 = require('./auth/v2/auth.routes');
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use(middlewares.checkTokenSetUser);
 app.use('/auth', auth);
 app.use('/api/v1/notes', middlewares.isLoggedIn, notes);
 app.use('/api/v1/users', middlewares.isLoggedIn, middlewares.isAdmin, users);
+app.use('/auth/v2/', authv2);
 
 app.get('/', (req, res) => {
   res.status(200);

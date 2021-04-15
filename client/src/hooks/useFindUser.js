@@ -6,9 +6,7 @@ export default function useFindUser() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setUser({
-      user: null,
-    });
+    setUser(null);
   }, []);
 
   return {
