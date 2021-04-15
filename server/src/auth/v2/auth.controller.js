@@ -18,6 +18,13 @@ const returnError = (code, res, next) => {
   next(error);
 };
 
+const get = (req, res) => {
+  res.json({
+    message: 'auth router v2 🐾',
+    user: req.user,
+  });
+};
+
 const signToken = (payload) =>
   jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: expiration });
 
@@ -120,7 +127,7 @@ const login = async (req, res, next) => {
   }
 };
 
-const logout = (req, res, next) => {
+const logout = (req, res) => {
   res.cookie('jwt', 'loggedout', {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
@@ -129,6 +136,7 @@ const logout = (req, res, next) => {
 };
 
 module.exports = {
+  get,
   checkUser,
   science,
   signup,

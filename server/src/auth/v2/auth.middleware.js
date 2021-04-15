@@ -3,7 +3,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../../models/User');
 
 const schema = Joi.object({
-  username: Joi.string().alphanum().min(3).max(20).required(),
+  username: Joi.string().alphanum().min(3).max(20)
+    .required(),
   password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9_]{8,30}$')).required(),
 });
 
@@ -69,7 +70,7 @@ const validateBody = (defaultErrorMessage) => (req, res, next) => {
 const findUser = (defaultLoginError, isError, errorCode = 422) => async (
   req,
   res,
-  next
+  next,
 ) => {
   const user = await User.findOne({ username: req.body.username });
   if (isError(user)) {
