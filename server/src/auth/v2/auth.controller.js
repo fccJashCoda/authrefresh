@@ -64,7 +64,26 @@ const science = (req, res, next) => {
   // res.json({ message: 'bro wtf' });
 };
 
-const checkUser = async (req, res, next) => {};
+const checkUser = async (req, res, next) => {
+  let currentUser;
+  console.log('check user');
+
+  if (req.cookies.jwt) {
+    try {
+      const token = req.cookies.jwt;
+      const decoded = await jwt.verify(token, process.env.SECRET_KEY);
+      console.log('decoded: ', decoded);
+      currentUser = await User.findById(decoded._id).select('-password');
+      console.log('check user, user found: ', currentUser);
+    } catch (error) {
+      return returnError(500, res, next);
+    }
+  } else {
+    currentUser = null;
+  }
+
+  res.status(200).json({ currentUser });
+};
 
 const signup = async (req, res, next) => {
   try {

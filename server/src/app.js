@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const helmet = require('helmet');
 require('dotenv').config();
@@ -17,10 +18,11 @@ if (process.env.NODE_ENV !== 'test') {
 }
 app.use(express.urlencoded());
 app.use(express.json());
+app.use(cookieParser());
 app.use(
   cors({
     origin: 'http://localhost:3000',
-  }),
+  })
 );
 app.use(helmet());
 app.use(middlewares.checkTokenSetUser);
