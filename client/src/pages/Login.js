@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import Loader from '../components/Loader';
 import Joi from 'joi';
-import { useAuth } from '../router/ProvideAuth';
+import useAuth from '../hooks/useAuth';
 import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 import tokenBridge from '../router/tokenBridge';
+import { UserContext } from '../hooks/UserContext';
 
 import InputComponent from '../components/InputComponent';
 
@@ -19,7 +20,8 @@ function Login() {
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const auth = useAuth();
+  const { user } = useContext(UserContext);
+  const { loginUser } = useAuth();
   const history = useHistory();
 
   const validateUser = () => {
@@ -39,26 +41,28 @@ function Login() {
     e.preventDefault();
 
     if (validateUser()) {
-      try {
-        setIsLoading(true);
-        const API_URL = '/auth/login';
-        const response = await axios.post(API_URL, {
-          username: username,
-          password: password,
-        });
-        console.log('response before throw', response);
-        if (response.status === 200) {
-          console.log('response: ', response);
-          tokenBridge.setToken(response.data.token);
-          auth.setUser(response.data.user);
-          history.push('/dashboard');
-        } else {
-          console.log('error: ', response);
-        }
-      } catch (error) {
-        setIsLoading(false);
-        setErrorMessage(error.response.data.message);
-      }
+      console.log('user is valid, proceeding to login');
+      loginUser({ username, password });
+      //   try {
+      //     setIsLoading(true);
+      //     const API_URL = '/auth/login';
+      //     const response = await axios.post(API_URL, {
+      //       username: username,
+      //       password: password,
+      //     });
+      //     console.log('response before throw', response);
+      //     if (response.status === 200) {
+      //       console.log('response: ', response);
+      //       tokenBridge.setToken(response.data.token);
+      //       setUser(response.data.user);
+      //       history.push('/dashboard');
+      //     } else {
+      //       console.log('error: ', response);
+      //     }
+      //   } catch (error) {
+      //     setIsLoading(false);
+      //     setErrorMessage(error.response.data.message);
+      //   }
     }
   };
 
@@ -66,7 +70,7 @@ function Login() {
     setErrorMessage('');
   }, [username, password]);
 
-  if (auth.user) {
+  if (user) {
     history.push('/');
   }
 
@@ -112,7 +116,7 @@ function Login() {
           </button>
         </form>
       )}
-      <p>Safety {auth.user ? 'OFF' : 'ON'}</p>
+      <p>Safety {user ? 'OFF' : 'ON'}</p>
     </section>
   );
 }

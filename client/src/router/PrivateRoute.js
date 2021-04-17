@@ -1,13 +1,15 @@
-import { useAuth } from './ProvideAuth';
+import { useContext } from 'react';
+import useAuth from '../hooks/useAuth';
+import { UserContext } from '../hooks/UserContext';
 import { Route, Redirect } from 'react-router-dom';
 
 function PrivateRoute({ children, ...rest }) {
-  let auth = useAuth();
+  const { user } = useContext(UserContext);
   return (
     <Route
       {...rest}
       render={({ location }) =>
-        auth.user ? (
+        user ? (
           children
         ) : (
           <Redirect

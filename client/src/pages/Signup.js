@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import Joi from 'joi';
 import Loader from '../components/Loader';
 import Inputcomponent from '../components/InputComponent';
+import { UserContext } from '../hooks/UserContext';
+import { useHistory } from 'react-router-dom';
 
 const schema = Joi.object({
   username: Joi.string().alphanum().min(3).max(30).required(),
@@ -17,6 +19,9 @@ function Signup() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const { user } = useContext(UserContext);
+  const history = useHistory();
 
   const validateUser = () => {
     if (password !== confirmPassword) {
@@ -108,6 +113,10 @@ function Signup() {
     password: 'Password must be at least 10 characters.',
     confirmPassword: 'Please confirm password',
   };
+
+  if (user) {
+    history.push('/');
+  }
 
   return (
     <section className='container'>
