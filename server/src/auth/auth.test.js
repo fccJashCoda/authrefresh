@@ -36,7 +36,7 @@ describe('Sign-up Suite', () => {
         .send({ username: 'ab' })
         .expect(422);
       expect(response.body.message).to.equal(
-        '"username" length must be at least 3 characters long',
+        '"username" length must be at least 3 characters long'
       );
     });
     it('password should match the base regex pattern', async () => {
@@ -48,7 +48,7 @@ describe('Sign-up Suite', () => {
         })
         .expect(422);
       expect(response.body.message).to.equal(
-        '"password" with value "ab" fails to match the required pattern: /^[a-zA-Z0-9_]{8,30}$/',
+        '"password" with value "ab" fails to match the required pattern: /^[a-zA-Z0-9_]{8,30}$/'
       );
     });
   });

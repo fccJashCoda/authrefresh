@@ -5,32 +5,40 @@ import axios from 'axios';
 
 const useAuth = () => {
   let history = useHistory();
-  const { setUser } = useContext(UserContext);
+  const { setUser, setIsLoading } = useContext(UserContext);
+  const [error, setError] = useState(null);
 
   const setUserContext = async () => {
     return await axios
       .get('/auth/v2/user')
       .then((res) => {
-        console.log('settint user context');
+        console.log('setting user context');
         console.log(res);
         setUser(res.data.currentUser);
         history.push('/dashboard');
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log('setusercontext error: ', err));
   };
 
   const loginUser = async (data) => {
     const { username, password } = data;
+    setIsLoading(true);
     return axios
       .post('auth/v2/login', {
         username,
         password,
       })
       .then(async (res) => {
+        console.log('login response');
         console.log(res.data.status);
         return await setUserContext();
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        setTimeout(() => {
+          setError(err);
+          setIsLoading(false);
+        }, 1000);
+      });
   };
 
   const registerUser = async () => {};
@@ -38,6 +46,7 @@ const useAuth = () => {
   return {
     loginUser,
     registerUser,
+    error,
   };
 };
 

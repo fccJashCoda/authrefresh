@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export default function useFindUser() {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const findUser = async () => {
@@ -21,7 +21,6 @@ export default function useFindUser() {
     user,
     setUser,
     isLoading,
+    setIsLoading,
   };
 }
-
-// Yun Asaki Kishunuba
