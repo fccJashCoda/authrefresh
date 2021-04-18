@@ -89,6 +89,12 @@ function Signup() {
   }, [username, password, confirmPassword]);
 
   useEffect(() => {
+    if (user) {
+      history.push('/dashboard');
+    }
+  }, []);
+
+  useEffect(() => {
     const auth = async (token) => {
       const response = await fetch('/auth', {
         method: 'GET',
@@ -113,10 +119,6 @@ function Signup() {
     password: 'Password must be at least 10 characters.',
     confirmPassword: 'Please confirm password',
   };
-
-  if (user) {
-    history.push('/');
-  }
 
   return (
     <section className='container'>

@@ -28,7 +28,7 @@ const useAuth = () => {
       })
       .then(async (res) => {
         console.log(res.data.status);
-        await setUserContext();
+        return await setUserContext();
       })
       .catch((err) => console.log(err));
   };

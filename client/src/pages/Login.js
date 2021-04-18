@@ -70,9 +70,11 @@ function Login() {
     setErrorMessage('');
   }, [username, password]);
 
-  if (user) {
-    history.push('/');
-  }
+  useEffect(() => {
+    if (user) {
+      history.push('/dashboard');
+    }
+  }, []);
 
   const loginHelp = {
     username: 'Enter your username to login.',

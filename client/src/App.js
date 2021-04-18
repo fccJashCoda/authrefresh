@@ -13,12 +13,12 @@ import Header from './sections/Header';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 
 function App() {
-  const { user, setUser, testvalue, isLoading } = useFindUser();
+  const { user, setUser, isLoading } = useFindUser();
 
   console.log(user);
   return (
     <Router>
-      <UserContext.Provider value={{ user, setUser, testvalue, isLoading }}>
+      <UserContext.Provider value={{ user, setUser, isLoading }}>
         <div className='App'>
           <Header />
           <main>
