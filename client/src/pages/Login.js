@@ -6,6 +6,7 @@ import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 import tokenBridge from '../router/tokenBridge';
 import { UserContext } from '../hooks/UserContext';
+import useForm from '../hooks/useForm';
 
 import InputComponent from '../components/InputComponent';
 
@@ -18,6 +19,13 @@ function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const { values, handleChange } = useForm({
+    initialValues: {
+      username: '',
+      password: '',
+    },
+  });
+
   // const [isLoading, setIsLoading] = useState(false);
 
   const { user, isLoading } = useContext(UserContext);
@@ -25,7 +33,7 @@ function Login() {
   const history = useHistory();
 
   const validateUser = () => {
-    const result = schema.validate({ username, password });
+    const result = schema.validate(values.initialValues);
 
     if (!result.error) return true;
 
@@ -37,36 +45,15 @@ function Login() {
     return false;
   };
 
-  const login = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     if (validateUser()) {
       console.log('user is valid, proceeding to login');
-      // setIsLoading(true);
-      loginUser({ username, password });
-      // setTimeout(() => {
-      //   setIsLoading(false);
-      // }, 1000);
-      //   try {
-      //     setIsLoading(true);
-      //     const API_URL = '/auth/login';
-      //     const response = await axios.post(API_URL, {
-      //       username: username,
-      //       password: password,
-      //     });
-      //     console.log('response before throw', response);
-      //     if (response.status === 200) {
-      //       console.log('response: ', response);
-      //       tokenBridge.setToken(response.data.token);
-      //       setUser(response.data.user);
-      //       history.push('/dashboard');
-      //     } else {
-      //       console.log('error: ', response);
-      //     }
-      //   } catch (error) {
-      //     setIsLoading(false);
-      //     setErrorMessage(error.response.data.message);
-      //   }
+      loginUser({
+        username: values.username,
+        password: values.password,
+      });
     }
   };
 
@@ -93,42 +80,44 @@ function Login() {
 
   return (
     <section className='container'>
-      {isLoading && <Loader />}
-      {/* {!isLoading && ( */}
-      <form onSubmit={(e) => login(e)} className='mt-3'>
-        <h1>Login</h1>
-        {errorMessage && (
-          <div className='alert alert-danger' role='alert'>
-            {errorMessage}
-          </div>
-        )}
-        <div className='mb-3'>
-          <InputComponent
-            name='username'
-            title='Username'
-            action={setUsername}
-            placeholder='Enter username'
-            message={loginHelp.username}
-          />
-        </div>
-        <div className='row mb-3'>
-          <div className='col'>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <form onSubmit={(e) => handleLogin(e)} className='mt-3'>
+          <h1>Login</h1>
+          {errorMessage && (
+            <div className='alert alert-danger' role='alert'>
+              {errorMessage}
+            </div>
+          )}
+          <div className='mb-3'>
             <InputComponent
-              name='password'
-              title='Password'
-              type='password'
-              action={setPassword}
-              placeholder='Password'
+              name='username'
+              title='Username'
+              action={handleChange}
+              value={values.username}
+              placeholder='Enter username'
               message={loginHelp.username}
             />
           </div>
-        </div>
-        <button type='submit' className='btn btn-primary mb-5'>
-          Login
-        </button>
-      </form>
-      {/* )} */}
-      <p>Safety {user ? 'OFF' : 'ON'}</p>
+          <div className='row mb-3'>
+            <div className='col'>
+              <InputComponent
+                name='password'
+                title='Password'
+                type='password'
+                action={handleChange}
+                value={values.password}
+                placeholder='Password'
+                message={loginHelp.username}
+              />
+            </div>
+          </div>
+          <button type='submit' className='btn btn-primary mb-5'>
+            Login
+          </button>
+        </form>
+      )}
     </section>
   );
 }

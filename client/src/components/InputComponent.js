@@ -5,7 +5,7 @@ function InputComponent(props) {
         {props.title}
       </label>
       <input
-        onChange={(e) => props.action(e.target.value)}
+        onChange={(e) => props.action(e)}
         type={props.type}
         required
         className='form-control'
@@ -13,6 +13,7 @@ function InputComponent(props) {
         id={props.name}
         name={props.name}
         placeholder={props.placeholder}
+        value={props.value}
       />
       <small id={`${props.name}Help`} className='form-text text-muted'>
         {props.message}

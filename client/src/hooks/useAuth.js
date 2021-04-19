@@ -15,6 +15,7 @@ const useAuth = () => {
         console.log('setting user context');
         console.log(res);
         setUser(res.data.currentUser);
+        setIsLoading(false);
         history.push('/dashboard');
       })
       .catch((err) => console.log('setusercontext error: ', err));
