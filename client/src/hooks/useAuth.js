@@ -42,7 +42,25 @@ const useAuth = () => {
       });
   };
 
-  const registerUser = async () => {};
+  const registerUser = async (data) => {
+    const { username, password } = data;
+    setIsLoading(true);
+    return axios
+      .post('auth/v2/signup', {
+        username,
+        password,
+      })
+      .then(async (res) => {
+        console.log(res);
+        return await setUserContext();
+      })
+      .catch((err) => {
+        setTimeout(() => {
+          setError(err);
+          setIsLoading(false);
+        }, 1000);
+      });
+  };
 
   return {
     loginUser,

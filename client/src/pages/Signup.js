@@ -4,6 +4,8 @@ import Loader from '../components/Loader';
 import Inputcomponent from '../components/InputComponent';
 import { UserContext } from '../hooks/UserContext';
 import { useHistory } from 'react-router-dom';
+import useAuth from '../hooks/useAuth';
+import useForm from '../hooks/useForm';
 
 const schema = Joi.object({
   username: Joi.string().alphanum().min(3).max(30).required(),
@@ -14,21 +16,27 @@ const schema = Joi.object({
 });
 
 function Signup() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const { registerUser, error } = useAuth();
+  const { values, handleChange } = useForm({
+    initialValues: {
+      username: '',
+      password: '',
+      confirmPassword: '',
+    },
+  });
 
-  const { user } = useContext(UserContext);
+  const { user, isLoading } = useContext(UserContext);
   const history = useHistory();
 
   const validateUser = () => {
-    if (password !== confirmPassword) {
-      setErrorMessage('Password and Confirm Password must match');
+    if (values.password !== values.confirmPassword) {
+      return setErrorMessage('Password and Confirm Password must match');
     }
 
-    const result = schema.validate({ username, password, confirmPassword });
+    const result = schema.validate(values);
+
+    console.log(result);
 
     if (!result.error) {
       return true;
@@ -42,76 +50,33 @@ function Signup() {
     return false;
   };
 
-  const signup = async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
 
     if (validateUser()) {
-      const API_URL = '/auth/signup';
-      const payload = {
-        username,
-        password,
-      };
-
-      console.log(payload);
-
-      const options = {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      };
-
-      setIsLoading(true);
-      try {
-        const response = await fetch(API_URL, options);
-        const result = await response.json();
-        await setTimeout(() => {
-          if (response.status === 200) {
-            localStorage.setItem('token', result.token);
-            window.location.href = '/dashboard';
-          } else {
-            setErrorMessage(result.message);
-          }
-          setIsLoading(false);
-        }, 1500);
-      } catch (error) {
-        await setTimeout(() => {
-          setErrorMessage(error.message);
-          setIsLoading(false);
-        }, 1000);
-      }
+      console.log(values);
+      registerUser({
+        username: values.username,
+        password: values.password,
+      });
     }
   };
 
   useEffect(() => {
     setErrorMessage('');
-  }, [username, password, confirmPassword]);
+  }, [values.username, values.password, values.confirmPassword]);
 
   useEffect(() => {
     if (user) {
       history.push('/dashboard');
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
-    const auth = async (token) => {
-      const response = await fetch('/auth', {
-        method: 'GET',
-        headers: {
-          Authorization: `bearer ${token}`,
-        },
-      });
-      const auth = await response.json();
-      if (auth.user) {
-        window.location.href = '/dashboard';
-      }
-    };
-    const token = localStorage.getItem('token');
-    if (token) {
-      auth(token);
+    if (error && error.message.includes(409)) {
+      setErrorMessage('Invalid Username');
     }
-  }, []);
+  }, [error]);
 
   const signupHelp = {
     username:
@@ -122,9 +87,10 @@ function Signup() {
 
   return (
     <section className='container'>
-      {isLoading && <Loader />}
-      {!isLoading && (
-        <form onSubmit={(e) => signup(e)} className='mt-3'>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <form onSubmit={(e) => handleSignup(e)} className='mt-3'>
           <h1>Signup</h1>
           {errorMessage && (
             <div className='alert alert-danger'>{errorMessage}</div>
@@ -134,8 +100,9 @@ function Signup() {
               name='username'
               title='Username'
               placeholder='Enter username'
-              action={setUsername}
+              action={handleChange}
               message={signupHelp.username}
+              value={values.username}
             />
           </div>
           <div className='row mb-3'>
@@ -145,8 +112,9 @@ function Signup() {
                 name='password'
                 title='Password'
                 placeholder='Password'
-                action={setPassword}
+                action={handleChange}
                 message={signupHelp.password}
+                value={values.password}
               />
             </div>
             <div className='col'>
@@ -155,8 +123,9 @@ function Signup() {
                 name='confirmPassword'
                 title='Confirm Password'
                 placeholder='Confirm Password'
-                action={setConfirmPassword}
+                action={handleChange}
                 message={signupHelp.confirmPassword}
+                value={values.confirmPassword}
               />
             </div>
           </div>

@@ -3,8 +3,6 @@ import Loader from '../components/Loader';
 import Joi from 'joi';
 import useAuth from '../hooks/useAuth';
 import { useHistory } from 'react-router-dom';
-import axios from 'axios';
-import tokenBridge from '../router/tokenBridge';
 import { UserContext } from '../hooks/UserContext';
 import useForm from '../hooks/useForm';
 
@@ -16,8 +14,6 @@ const schema = Joi.object({
 });
 
 function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const { values, handleChange } = useForm({
     initialValues: {
@@ -26,14 +22,12 @@ function Login() {
     },
   });
 
-  // const [isLoading, setIsLoading] = useState(false);
-
   const { user, isLoading } = useContext(UserContext);
   const { loginUser, error } = useAuth();
   const history = useHistory();
 
   const validateUser = () => {
-    const result = schema.validate(values.initialValues);
+    const result = schema.validate(values);
 
     if (!result.error) return true;
 
@@ -58,7 +52,7 @@ function Login() {
 
   useEffect(() => {
     setErrorMessage('');
-  }, [username, password]);
+  }, [values.username, values.password]);
 
   useEffect(() => {
     if (user) {
