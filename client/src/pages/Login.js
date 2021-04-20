@@ -49,7 +49,6 @@ function Login() {
     e.preventDefault();
 
     if (validateUser()) {
-      console.log('user is valid, proceeding to login');
       loginUser({
         username: values.username,
         password: values.password,
@@ -65,7 +64,7 @@ function Login() {
     if (user) {
       history.push('/dashboard');
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (error && error.message.includes(401)) {
