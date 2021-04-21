@@ -36,8 +36,6 @@ function Signup() {
 
     const result = schema.validate(values);
 
-    console.log(result);
-
     if (!result.error) {
       return true;
     }
@@ -54,7 +52,6 @@ function Signup() {
     e.preventDefault();
 
     if (validateUser()) {
-      console.log(values);
       registerUser({
         username: values.username,
         password: values.password,

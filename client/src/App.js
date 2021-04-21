@@ -9,6 +9,7 @@ import PrivateRoute from './router/PrivateRoute';
 import { UserContext } from './hooks/UserContext';
 import useFindUser from './hooks/useFindUser';
 import Header from './sections/Header';
+import Account from './pages/Account';
 
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 
@@ -34,6 +35,9 @@ function App() {
               </Route>
               <Route exact path='/signup'>
                 <Signup />
+              </Route>
+              <Route exact path='/account'>
+                <Account />
               </Route>
               <Route path='*'>
                 <NotFound />

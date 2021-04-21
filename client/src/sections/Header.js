@@ -30,9 +30,9 @@ const Header = () => {
         <ul className='navbar-nav me-auto mb-2 mb-lg-0'>
           {user ? (
             <li className='nav-item'>
-              <a className='nav-link active' aria-current='page' href='#'>
-                Welcome, {user.username}
-              </a>
+              <span className='nav-link active' aria-current='page' href='#'>
+                Welcome, <Link to='/account'>{user.username}</Link>
+              </span>
             </li>
           ) : (
             <li className='nav-item'>
