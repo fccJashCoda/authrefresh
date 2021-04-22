@@ -19,21 +19,34 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-router.post('/', middleware.validateBody, (req, res, next) => {
+router.post('/', middleware.validateBody, async (req, res, next) => {
+  const { title, text } = req.body;
   try {
-    res.json({ message: 'Note created' });
-    // get the user id from the cookie
-    // build the note
-    // save the note
+    const token = req.cookies.jwt;
+    const decoded = jwt.decode(token, process.env.SECRET_KEY);
+
+    const newNote = new Note({
+      title,
+      text,
+      user_id: decoded._id,
+    });
+    const savedNote = await newNote.save();
+    res.json({ message: 'Note created', note: savedNote });
   } catch (err) {
-    next(err);
+    const error = new Error('Server Error');
+    res.status(500);
+    next(error);
   }
 });
 
-router.delete('/:id', (req, res, next) => {
+router.delete('/:id', async (req, res, next) => {
   try {
+    await Note.deleteOne({ _id: req.params.id });
+    res.json({ message: `Deleted note with id: ${req.params.id}` });
   } catch (err) {
-    console.log(err);
+    const error = new Error('Invalid note Id');
+    res.status(500);
+    next(error);
   }
 });
 
