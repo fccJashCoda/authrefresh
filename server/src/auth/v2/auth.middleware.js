@@ -3,30 +3,17 @@ const jwt = require('jsonwebtoken');
 const User = require('../../models/User');
 
 const schema = Joi.object({
-  username: Joi.string().alphanum().min(3).max(20)
-    .required(),
+  username: Joi.string().alphanum().min(3).max(20).required(),
   password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9_]{8,30}$')).required(),
 });
 
-function checkTokenSetUser(req, res, next) {
-  const authHeader = req.get('Authorization');
-  if (authHeader) {
-    const token = authHeader.split(' ')[1];
-    if (token) {
-      jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
-        if (err) {
-          const error = new Error('Token expired');
-          res.status(401);
-          return next(error);
-        }
-        req.user = user;
-        next();
-      });
-    } else {
-      next();
-    }
-  } else {
+function checkCookies(req, res, next) {
+  if (req.cookies.jwt) {
     next();
+  } else {
+    const error = new Error('Unauthorized access');
+    res.status(401);
+    next(error);
   }
 }
 
@@ -70,7 +57,7 @@ const validateBody = (defaultErrorMessage) => (req, res, next) => {
 const findUser = (defaultLoginError, isError, errorCode = 422) => async (
   req,
   res,
-  next,
+  next
 ) => {
   const user = await User.findOne({ username: req.body.username });
   if (isError(user)) {
@@ -84,7 +71,7 @@ const findUser = (defaultLoginError, isError, errorCode = 422) => async (
 };
 
 module.exports = {
-  checkTokenSetUser,
+  checkCookies,
   isLoggedIn,
   isAdmin,
   validateBody,

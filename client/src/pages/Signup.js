@@ -61,7 +61,7 @@ function Signup() {
 
   useEffect(() => {
     setErrorMessage('');
-  }, [values.username, values.password, values.confirmPassword]);
+  }, [values]);
 
   useEffect(() => {
     if (user) {

@@ -10,6 +10,7 @@ export default function useFindUser() {
       await axios
         .get('/auth/v2/user')
         .then((res) => {
+          console.log('useFindUser res: ', res);
           setUser(res.data.currentUser);
         })
         .catch((err) => console.log(err));

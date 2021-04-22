@@ -35,11 +35,26 @@ const Header = () => {
               </span>
             </li>
           ) : (
-            <li className='nav-item'>
-              <a className='nav-link active' aria-current='page' href='#'>
-                Login
-              </a>
-            </li>
+            <>
+              <li className='nav-item'>
+                <Link
+                  to='/login'
+                  className='nav-link active'
+                  aria-current='page'
+                >
+                  Login
+                </Link>
+              </li>
+              <li className='nav-item'>
+                <Link
+                  to='/signup'
+                  className='nav-link active'
+                  aria-current='page'
+                >
+                  Signup
+                </Link>
+              </li>
+            </>
           )}
         </ul>
       </div>

@@ -68,20 +68,16 @@ const science = (req, res, next) => {
     res,
     next
   );
-  // res.json({ message: 'bro wtf' });
 };
 
 const checkUser = async (req, res, next) => {
   let currentUser;
-  console.log('check user');
 
   if (req.cookies.jwt) {
     try {
       const token = req.cookies.jwt;
       const decoded = await jwt.verify(token, process.env.SECRET_KEY);
-      console.log('decoded: ', decoded);
       currentUser = await User.findById(decoded._id).select('-password');
-      console.log('check user, user found: ', currentUser);
     } catch (error) {
       return returnError(500, res, next);
     }
@@ -110,13 +106,10 @@ const signup = async (req, res, next) => {
 };
 
 const login = async (req, res, next) => {
-  console.log(req.body);
-  console.log(req.loggingInUser);
   try {
     const { password } = req.body;
     const user = req.loggingInUser;
     const valid = await bcrypt.compare(password, user.password);
-    console.log('password is valid');
     if (valid) {
       createTokenSendResponse(user, req, res, next);
     } else {

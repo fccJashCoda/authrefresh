@@ -52,7 +52,7 @@ function Login() {
 
   useEffect(() => {
     setErrorMessage('');
-  }, [values.username, values.password]);
+  }, [values]);
 
   useEffect(() => {
     if (user) {

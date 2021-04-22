@@ -1,13 +1,14 @@
 const express = require('express');
 const controller = require('./notes.controller');
 const middleware = require('./notes.middleware');
+const authMiddleware = require('../../auth/v2/auth.middleware');
 
 const router = express.Router();
 
 // @route GET /api/v1/notes/
 // @desc get all notes
 // @access private
-router.get('/', controller.getAll);
+router.get('/', authMiddleware.checkCookies, controller.getAll);
 
 // @route POST /api/v1/notes/
 // @desc add a new note

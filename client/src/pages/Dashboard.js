@@ -1,7 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { UserContext } from '../hooks/UserContext';
 import Joi from 'joi';
 import NoteContainer from '../components/NoteContainer';
 import InputComponent from '../components/InputComponent';
+import useLogout from '../hooks/useLogout';
+import useForm from '../hooks/useForm';
 
 const schema = Joi.object({
   title: Joi.string().trim().min(3).max(100).required(),
@@ -9,18 +12,20 @@ const schema = Joi.object({
 });
 
 function Dashboard() {
-  const [user, setUser] = useState({});
+  const { user } = useContext(UserContext);
+  const { values, handleChange } = useForm({
+    initialValues: {
+      title: '',
+      text: '',
+    },
+  });
+  const { logoutUser } = useLogout();
   const [notes, setNotes] = useState([]);
-  const [title, setTitle] = useState('');
-  const [text, setText] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [showForm, setShowForm] = useState(true);
 
-  // const auth = useAuth();
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    window.location.href = '/login';
+  const handleLogout = () => {
+    logoutUser();
   };
 
   const addNote = async (e) => {
@@ -29,8 +34,8 @@ function Dashboard() {
     if (validNote()) {
       const token = localStorage.getItem('token');
       const payload = {
-        title,
-        text,
+        title: values.title,
+        text: values.text,
       };
 
       const options = {
@@ -53,7 +58,8 @@ function Dashboard() {
   };
 
   const validNote = () => {
-    const valid = schema.validate({ title, text });
+    // const valid = schema.validate({ title, text });
+    const valid = schema.validate(values);
 
     if (!valid.error) return true;
 
@@ -75,48 +81,21 @@ function Dashboard() {
 
   const toggleForm = () => {
     setShowForm(!showForm);
-    console.log('form: ', showForm);
   };
 
   useEffect(() => {
     setErrorMessage('');
-    // console.log(auth.user);
-  }, [title, text]);
-
-  useEffect(() => {
-    // const auth = async () => {
-    //   const token = await localStorage.getItem('token');
-    //   const response = await fetch('/auth', {
-    //     method: 'GET',
-    //     headers: {
-    //       Authorization: `bearer ${token}`,
-    //     },
-    //   });
-    //   const auth = await response.json();
-    //   if (auth.user) {
-    //     setUser(auth.user);
-    //     getNotes();
-    //   } else {
-    //     logout();
-    //   }
-    // };
-    // auth();
-  }, []);
+  }, [values]);
 
   return (
     <section className='p-4 container'>
       <h1>Dashboard</h1>
-      {/* {auth.user ? (
-        <h3>Welcome, {auth.user.user}!</h3>
-      ) : (
-        <h3>Getting user information...</h3>
-      )} */}
-      {/* {user.username ? (
+      {user ? (
         <h3>Welcome, {user.username}!</h3>
       ) : (
         <h3>Getting user information...</h3>
-      )} */}
-      <button className='btn btn-warning mt-5' onClick={logout}>
+      )}
+      <button className='btn btn-warning mt-5' onClick={handleLogout}>
         Logout
       </button>
       <button className='btn btn-info mt-5' onClick={toggleForm}>
@@ -134,8 +113,9 @@ function Dashboard() {
               name='title'
               title='Title'
               placeholder='Enter your title'
-              action={setTitle}
+              action={handleChange}
               message='Enter a title for your note'
+              value={values.title}
             />
           </div>
           <div className='mb-3'>
@@ -143,12 +123,14 @@ function Dashboard() {
               Note
             </label>
             <textarea
-              onChange={(e) => setText(e.target.value)}
+              onChange={handleChange}
               required
               rows='4'
               className='form-control'
               id='note'
+              name='text'
               placeholder='Enter your note...'
+              value={values.text}
             ></textarea>
             <small id={`noteHelp`} className='form-text text-muted'>
               Enter the text description of you note.
