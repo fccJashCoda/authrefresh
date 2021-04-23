@@ -1,16 +1,15 @@
 import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import axios from 'axios';
 
 function NoteComponent(props) {
   const [showing, setShowing] = useState(true);
   const note = props.note;
 
   const deleteNote = async () => {
-    const options = {
-      method: 'DELETE',
-    };
     try {
-      const response = await fetch(`/api/v2/notes/${note._id}`, options);
+      const response = await axios.delete(`/api/v2/notes/${note._id}`);
+      console.log(response);
       if (response.status === 200) {
         setShowing(false);
       }

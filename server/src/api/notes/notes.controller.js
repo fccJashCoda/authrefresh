@@ -1,7 +1,8 @@
 const Note = require('../../models/Note');
 
-const getAll = (req, res, next) => {
+const getAll = async (req, res, next) => {
   Note.find({ user_id: req.user._id })
+    .sort({ createdAt: -1 })
     .then((notes) => {
       res.json(notes);
     })

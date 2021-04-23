@@ -5,6 +5,7 @@ import NoteContainer from '../components/NoteContainer';
 import InputComponent from '../components/InputComponent';
 import useLogout from '../hooks/useLogout';
 import useForm from '../hooks/useForm';
+import axios from 'axios';
 
 const schema = Joi.object({
   title: Joi.string().trim().min(3).max(100).required(),
@@ -37,17 +38,9 @@ function Dashboard() {
         text: values.text,
       };
 
-      const options = {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      };
-
       try {
-        const response = await fetch('/api/v2/notes', options);
-        const result = await response.json();
+        const response = await axios.post('/api/v2/notes', payload);
+        const result = response.data || [];
         setNotes([result.note, ...notes]);
       } catch (error) {
         setErrorMessage(error.message);
@@ -65,8 +58,8 @@ function Dashboard() {
   };
 
   const getNotes = async () => {
-    const response = await fetch('/api/v2/notes');
-    const result = await response.json();
+    const response = await axios.get('/api/v2/notes');
+    const result = response.data || [];
     setNotes(result);
   };
 
