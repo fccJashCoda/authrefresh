@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const Joi = require('joi');
 
 const schema = new Joi.object({
@@ -15,6 +16,18 @@ const validateBody = (req, res, next) => {
   }
 };
 
+const setUser = (req, res, next) => {
+  try {
+    const token = req.cookies.jwt;
+    const decoded = jwt.decode(token, process.env.SECRET_KEY);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
+  setUser,
   validateBody,
 };
