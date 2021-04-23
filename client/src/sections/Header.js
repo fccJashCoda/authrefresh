@@ -3,9 +3,7 @@ import { UserContext } from '../hooks/UserContext';
 import { Link } from 'react-router-dom';
 
 const Header = () => {
-  const { user, testvalue } = useContext(UserContext);
-
-  console.log('testvalue', testvalue);
+  const { user } = useContext(UserContext);
 
   return (
     <nav className='navbar navbar-expand-lg navbar-dark bg-primary'>

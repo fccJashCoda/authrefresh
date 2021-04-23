@@ -6,15 +6,11 @@ function NoteComponent(props) {
   const note = props.note;
 
   const deleteNote = async () => {
-    const token = localStorage.getItem('token');
     const options = {
       method: 'DELETE',
-      headers: {
-        Authorization: `bearer ${token}`,
-      },
     };
     try {
-      const response = await fetch(`/api/v1/notes/${note._id}`, options);
+      const response = await fetch(`/api/v2/notes/${note._id}`, options);
       if (response.status === 200) {
         setShowing(false);
       }

@@ -32,7 +32,6 @@ function Dashboard() {
     e.preventDefault();
 
     if (validNote()) {
-      const token = localStorage.getItem('token');
       const payload = {
         title: values.title,
         text: values.text,
@@ -42,13 +41,12 @@ function Dashboard() {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          Authorization: `bearer ${token}`,
         },
         body: JSON.stringify(payload),
       };
 
       try {
-        const response = await fetch('/api/v1/notes', options);
+        const response = await fetch('/api/v2/notes', options);
         const result = await response.json();
         setNotes([result.note, ...notes]);
       } catch (error) {
@@ -58,7 +56,6 @@ function Dashboard() {
   };
 
   const validNote = () => {
-    // const valid = schema.validate({ title, text });
     const valid = schema.validate(values);
 
     if (!valid.error) return true;
@@ -68,13 +65,7 @@ function Dashboard() {
   };
 
   const getNotes = async () => {
-    const token = await localStorage.getItem('token');
-    const response = await fetch('/api/v1/notes', {
-      method: 'GET',
-      headers: {
-        Authorization: `bearer ${token}`,
-      },
-    });
+    const response = await fetch('/api/v2/notes');
     const result = await response.json();
     setNotes(result);
   };
@@ -86,6 +77,10 @@ function Dashboard() {
   useEffect(() => {
     setErrorMessage('');
   }, [values]);
+
+  useEffect(() => {
+    getNotes();
+  }, []);
 
   return (
     <section className='p-4 container'>
@@ -133,7 +128,7 @@ function Dashboard() {
               value={values.text}
             ></textarea>
             <small id={`noteHelp`} className='form-text text-muted'>
-              Enter the text description of you note.
+              Enter the text description of your note.
             </small>
           </div>
           <button
