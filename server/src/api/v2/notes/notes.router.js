@@ -10,7 +10,7 @@ router.post(
   '/',
   middleware.validateBody,
   middleware.setUser,
-  controller.postNote
+  controller.postNote,
 );
 
 router.delete('/:id', controller.deleteNote);

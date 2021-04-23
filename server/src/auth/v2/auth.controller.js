@@ -25,8 +25,7 @@ const get = (req, res) => {
   });
 };
 
-const signToken = (payload) =>
-  jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: expiration });
+const signToken = (payload) => jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: expiration });
 
 const createTokenSendResponse = async (user, req, res, next) => {
   try {
@@ -66,7 +65,7 @@ const science = (req, res, next) => {
     },
     req,
     res,
-    next
+    next,
   );
 };
 

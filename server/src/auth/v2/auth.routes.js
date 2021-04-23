@@ -14,13 +14,13 @@ router.post(
   '/signup',
   middleware.validateBody(),
   middleware.findUser(signInError, (user) => user, 409),
-  authController.signup
+  authController.signup,
 );
 router.post(
   '/login',
   middleware.validateBody(defaultLoginError),
   middleware.findUser(defaultLoginError, (user) => !(user && user.active)),
-  authController.login
+  authController.login,
 );
 router.get('/logout', authController.logout);
 

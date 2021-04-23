@@ -71,7 +71,7 @@ describe('POST /api/v2/notes/', () => {
         })
         .expect(422);
       expect(response.body.message).to.equal(
-        '"title" is not allowed to be empty'
+        '"title" is not allowed to be empty',
       );
     });
     it('returns an error if no title is provided', async () => {
@@ -83,7 +83,7 @@ describe('POST /api/v2/notes/', () => {
         })
         .expect(422);
       expect(response.body.message).to.equal(
-        '"text" is not allowed to be empty'
+        '"text" is not allowed to be empty',
       );
     });
     it('returns a message when a notes is successfully posted', async () => {
