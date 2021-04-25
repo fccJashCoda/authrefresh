@@ -14,5 +14,6 @@ module.exports = {
     'consistent-return': 0,
     'new-cap': 'warn',
     'newline-per-chained-call': 'warn',
+    'max-len': 'warn',
   },
 };
