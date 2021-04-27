@@ -24,6 +24,7 @@ const findUser = async (req, res, next) => {
     const user = await User.findOne(query);
     if (user) {
       req.userpayload = user;
+      console.log('users middlewarre:', req.userpayload);
       next();
     } else {
       res.status(404);

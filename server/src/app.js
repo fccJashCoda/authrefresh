@@ -35,8 +35,14 @@ app.use(helmet());
 // app.use('/api/v1/notes', middlewares.isLoggedIn, notes);
 // app.use('/api/v1/users', middlewares.isLoggedIn, middlewares.isAdmin, users);
 app.use('/auth/v2/', auth);
-app.use('/api/v2/notes', middleware.checkCookies, notesv2);
-app.use('/api/v2/users', middleware.isLoggedIn, middleware.isAdmin, usersv2);
+app.use('/api/v2/notes', middleware.checkCookies, middleware.setUser, notesv2);
+app.use(
+  '/api/v2/users',
+  middleware.checkCookies,
+  middleware.setUser,
+  middleware.isAdmin,
+  usersv2
+);
 
 app.get('/', (req, res) => {
   res.status(200);

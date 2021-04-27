@@ -11,6 +11,7 @@ import useFindUser from './hooks/useFindUser';
 import Header from './sections/Header';
 import Account from './pages/Account';
 import Adminboard from './pages/Adminboard';
+import AdminRoute from './router/AdminRoute';
 
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 
@@ -32,7 +33,9 @@ function App() {
                 <Dashboard />
               </PrivateRoute>
               <PrivateRoute exact path='/adminboard'>
-                <Adminboard />
+                <AdminRoute>
+                  <Adminboard />
+                </AdminRoute>
               </PrivateRoute>
               <Route exact path='/login'>
                 <Login />

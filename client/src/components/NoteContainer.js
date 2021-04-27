@@ -7,8 +7,10 @@ function NoteContainer(props) {
 
   useEffect(() => {
     setTimeout(() => {
-      setFetching(false);
       setNotes(props.notes);
+      setTimeout(() => {
+        setFetching(false);
+      }, 500);
     }, 500);
   }, [props.notes]);
 

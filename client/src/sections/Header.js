@@ -33,19 +33,15 @@ const Header = () => {
                   Welcome, <Link to='/account'>{user.username}</Link>
                 </span>
               </li>
-              {user.role === 'admin' ? (
-                <li className='nav-item'>
-                  <span
-                    className='nav-link active'
-                    aria-current='page'
-                    href='#'
-                  >
-                    <Link to='/adminboard'>Adminboard</Link>
-                  </span>
-                </li>
-              ) : (
-                <></>
-              )}
+              {/* {user.role === 'admin' ? ( */}
+              <li className='nav-item'>
+                <span className='nav-link active' aria-current='page' href='#'>
+                  <Link to='/adminboard'>Adminboard</Link>
+                </span>
+              </li>
+              {/* ) : ( */}
+              {/* <></> */}
+              {/* )} */}
             </>
           ) : (
             <>
