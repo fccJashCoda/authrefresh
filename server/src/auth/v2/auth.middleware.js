@@ -8,7 +8,7 @@ const schema = Joi.object({
 });
 
 function checkCookies(req, res, next) {
-  if (req.cookies.jwt) {
+  if (req.cookies.jwt && req.cookies.jwt !== 'loggedout') {
     next();
   } else {
     const error = new Error('Unauthorized access');
