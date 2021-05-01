@@ -5,11 +5,18 @@ import useForm from '../hooks/useForm';
 
 const UserList = (props) => {
   const [filteredList, setFilteredList] = useState(props.userList || []);
+  const [targetId, setTargetId] = useState('');
+
   const { values, handleChange } = useForm({
     initialValues: {
       pattern: '',
     },
   });
+
+  const handleClick = (id) => {
+    props.action(id);
+    console.log(id);
+  };
 
   useEffect(() => {
     setFilteredList(props.userList);
@@ -54,7 +61,8 @@ const UserList = (props) => {
           {filteredList.map((user, index) => (
             <tr
               style={{ cursor: 'pointer' }}
-              onClick={() => console.log(user.username)}
+              // onClick={() => console.log(user.username)}
+              onClick={() => handleClick(user._id)}
             >
               <th scope='row'>{index + 1}</th>
               <td colspan='1'>{user.username}</td>

@@ -12,6 +12,7 @@ import Header from './sections/Header';
 import Account from './pages/Account';
 import Adminboard from './pages/Adminboard';
 import AdminRoute from './router/AdminRoute';
+import UserDetail from './components/UserDetail';
 
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 
@@ -32,18 +33,23 @@ function App() {
               <PrivateRoute exact path='/dashboard'>
                 <Dashboard />
               </PrivateRoute>
-              <PrivateRoute exact path='/adminboard'>
+              <PrivateRoute path='/adminboard'>
                 <AdminRoute>
                   <Adminboard />
                 </AdminRoute>
               </PrivateRoute>
-              <Route exact path='/login'>
+              {/* <PrivateRoute exact path='/adminboard/:id'>
+                <AdminRoute>
+                  <UserDetail />
+                </AdminRoute>
+              </PrivateRoute> */}
+              <Route path='/login'>
                 <Login />
               </Route>
-              <Route exact path='/signup'>
+              <Route path='/signup'>
                 <Signup />
               </Route>
-              <Route exact path='/account'>
+              <Route path='/account'>
                 <Account />
               </Route>
               <Route path='*'>
