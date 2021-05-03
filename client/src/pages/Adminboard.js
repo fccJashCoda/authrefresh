@@ -26,6 +26,7 @@ const Adminboard = () => {
   };
 
   const checkUser = (id) => {
+    setTargetId(id);
     history.push(`/adminboard/${id}`);
   };
 
@@ -41,33 +42,21 @@ const Adminboard = () => {
     populateUserList();
   }, []);
 
-  useEffect(() => {
-    setTargetId(selectedUser._id);
-    console.log('apilink: ');
-  }, [selectedUser]);
-
-  useEffect(() => {
-    console.log(targetId);
-  }, [targetId]);
-
-  useEffect(() => {
-    console.log(match.path);
-  }, []);
-
   return (
     <section>
       <h1>Adminboard</h1>
-
-      <Link to={`${match.url}/607f53706b68494144f06356`}>Test</Link>
-
       <section class='container'>
         <Switch>
           <Route exact path={match.path}>
             <UserList userList={userList} action={checkUser} />
           </Route>
           <Route path={`${match.path}/:id`}>
-            <UserDetail />
+            <UserDetail
+              payload={userList.filter((usr) => usr._id === targetId)}
+              action={goBack}
+            />
           </Route>
+          -
         </Switch>
       </section>
     </section>
