@@ -14,7 +14,6 @@ const schema = Joi.object({
 
 const UserDetail = (props) => {
   const history = useHistory();
-  const user = props.payload[0];
   const [profile, setProfile] = useState(props.payload[0] || null);
   const [errorMessage, setErrorMessage] = useState('');
   const { values, handleChange } = useForm({
@@ -24,9 +23,8 @@ const UserDetail = (props) => {
       confirmPassword: '',
     },
   });
-  const [activeStatus, setActiveStatus] = useState(user.active);
-  const [role, setRole] = useState(user.role);
-  console.log(profile);
+  const [activeStatus, setActiveStatus] = useState(false);
+  const [role, setRole] = useState('');
 
   const validatePayload = () => {
     if (values.newPassword !== values.confirmPassword) {
@@ -57,14 +55,18 @@ const UserDetail = (props) => {
     e.preventDefault();
     if (validatePayload()) {
       const payload = {
-        username: values.newUsername || user.username,
+        username: values.newUsername || profile.username,
         active: activeStatus,
-        roles: role,
+        role,
       };
       if (values.newPassword) {
         payload.password = values.newPassword;
       }
-      const patched = await axios.patch(`/api/v2/users/${user._id}`, payload);
+      console.log(payload);
+      const patched = await axios.patch(
+        `/api/v2/users/${profile._id}`,
+        payload
+      );
       if (patched.status === 200) {
         history.push('/adminboard');
       }
@@ -80,21 +82,28 @@ const UserDetail = (props) => {
   }, [values]);
 
   useEffect(() => {
-    if (!user) {
+    if (!profile) {
       history.push('/adminboard');
+    } else {
+      setActiveStatus(profile.active);
+      setRole(profile.role);
     }
   }, []);
 
   return (
     <>
-      <img src='https://via.placeholder.com/150' alt='user profile' />
-      <p>User details</p>
-      <p>{user.username}</p>
-      <span>Id: {user._id}</span>
-      <p>Joined: {user.createdAt}</p>
-      <p>Last Updated: {user.updatedAt}</p>
-      <p>Role: {user.role}</p>
-      <p>Status: {user.active ? 'Active' : 'Inactive'}</p>
+      {profile && (
+        <div>
+          <img src='https://via.placeholder.com/150' alt='user profile' />
+          <p>User details</p>
+          <p>{profile.username}</p>
+          <span>Id: {profile._id}</span>
+          <p>Joined: {profile.createdAt}</p>
+          <p>Last Updated: {profile.updatedAt}</p>
+          <p>Role: {profile.role}</p>
+          <p>Status: {profile.active ? 'Active' : 'Inactive'}</p>
+        </div>
+      )}
 
       <hr />
 
