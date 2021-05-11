@@ -16,7 +16,7 @@ router.patch(
   '/:id',
   middleware.validateBody,
   middleware.findUser,
-  controller.updateUser
+  controller.updateUser,
 );
 
 module.exports = router;

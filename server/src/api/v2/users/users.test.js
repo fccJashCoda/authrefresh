@@ -1,7 +1,6 @@
 const request = require('supertest');
 const { expect } = require('chai');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const User = require('../../../models/User');
 
 const app = require('../../../app');
@@ -121,7 +120,7 @@ describe('PATCH /api/v2/users/:id', () => {
         .patch('/api/v2/users/potato')
         .expect(500);
       expect(response.body.message).to.equal(
-        'Cast to ObjectId failed for value "potato" at path "_id" for model "User"'
+        'Cast to ObjectId failed for value "potato" at path "_id" for model "User"',
       );
     });
     it('returns an error if the id is not attributed', async () => {
@@ -129,7 +128,7 @@ describe('PATCH /api/v2/users/:id', () => {
         .patch('/api/v2/users/5ead965726509e70bef52f83')
         .expect(404);
       expect(response.body.message).to.equal(
-        'Not Found - /api/v2/users/5ead965726509e70bef52f83'
+        'Not Found - /api/v2/users/5ead965726509e70bef52f83',
       );
     });
     it('returns a confirmation after a successfull operation', async () => {
@@ -147,7 +146,7 @@ describe('PATCH /api/v2/users/:id', () => {
         })
         .expect(422);
       expect(response.body.message).to.equal(
-        '"username" length must be at least 3 characters long'
+        '"username" length must be at least 3 characters long',
       );
     });
     it('returns a 422 if validation fails for password', async () => {
@@ -158,7 +157,7 @@ describe('PATCH /api/v2/users/:id', () => {
         })
         .expect(422);
       expect(response.body.message).to.equal(
-        '"password" with value "st" fails to match the required pattern: /^[a-zA-Z0-9_]{8,30}$/'
+        '"password" with value "st" fails to match the required pattern: /^[a-zA-Z0-9_]{8,30}$/',
       );
     });
     it('returns a 422 if validation fails for roles', async () => {
@@ -169,7 +168,7 @@ describe('PATCH /api/v2/users/:id', () => {
         })
         .expect(422);
       expect(response.body.message).to.equal(
-        '"roles" must be one of [user, admin]'
+        '"roles" must be one of [user, admin]',
       );
     });
     it('returns a 422 if validation fails for active', async () => {

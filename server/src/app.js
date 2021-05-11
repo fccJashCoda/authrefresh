@@ -5,12 +5,8 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const helmet = require('helmet');
 require('dotenv').config();
-// const auth = require('./auth/auth.routes');
-const notes = require('./api/notes/notes.router');
-// const users = require('./api/users/users.router');
 const notesv2 = require('./api/v2/notes/notes.router');
 const usersv2 = require('./api/v2/users/users.router');
-// const middlewares = require('./auth/auth.middleware');
 const middleware = require('./auth/v2/auth.middleware');
 const auth = require('./auth/v2/auth.routes');
 
@@ -25,15 +21,9 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: 'http://localhost:3000',
-  })
+  }),
 );
 app.use(helmet());
-// app.use(middleware.checkTokenSetUser);
-
-// Router
-// app.use('/auth', auth);
-// app.use('/api/v1/notes', middlewares.isLoggedIn, notes);
-// app.use('/api/v1/users', middlewares.isLoggedIn, middlewares.isAdmin, users);
 app.use('/auth/v2/', auth);
 app.use('/api/v2/notes', middleware.checkCookies, middleware.setUser, notesv2);
 app.use(
@@ -41,7 +31,7 @@ app.use(
   middleware.checkCookies,
   middleware.setUser,
   middleware.isAdmin,
-  usersv2
+  usersv2,
 );
 
 app.get('/', (req, res) => {
